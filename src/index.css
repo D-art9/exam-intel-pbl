@@ -1,0 +1,67 @@
+@import "tailwindcss";
+
+@theme {
+  --color-neo-black: #0a0a0a;
+  --color-neo-surface: #121212;
+  --color-neo-orange: #ff5500;
+  --color-neo-white: #fafafa;
+
+  --font-sans: 'Space Grotesk', sans-serif;
+
+  /* Animations */
+  --animate-blur-in: blur-in 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  --animate-slide-up: slide-up 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+
+  @keyframes blur-in {
+    0% {
+      filter: blur(10px);
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    100% {
+      filter: blur(0);
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slide-up {
+    0% {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+/* Utilities */
+@utility scrollbar-hide {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Base Styles */
+:root {
+  color-scheme: dark;
+}
+
+html {
+  font-family: var(--font-sans);
+  background-color: var(--color-neo-black);
+  color: #ffffff;
+}
+
+body {
+  @apply bg-neo-black text-white antialiased selection:bg-neo-orange selection:text-black;
+}

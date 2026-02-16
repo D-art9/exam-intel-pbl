@@ -126,118 +126,120 @@ export function LandingPage() {
                     </NeoCard>
 
                 </div>
-                {/* Workflow Section (No Panels) */}
-                <section className="py-32 px-4 relative z-10">
-                    <div className="max-w-6xl mx-auto">
-                        <div className="text-center mb-16">
-                            <h2 className="text-3xl md:text-4xl font-black text-white uppercase tracking-tighter">
-                                From PDF to <span className="text-neo-orange">Intelligence</span>
-                            </h2>
-                            <p className="text-neutral-500 mt-4 font-mono">Three steps to exam dominance.</p>
-                        </div>
+            </section>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 relative">
-                            {/* Connecting Line (Desktop) */}
-                            <div className="hidden md:block absolute top-6 left-0 w-full h-px bg-neutral-800 -z-10" />
-
-                            {/* Step 1 */}
-                            <div className="flex flex-col items-center text-center group">
-                                <div className="w-12 h-12 bg-black border border-neutral-800 rounded-full flex items-center justify-center mb-6 group-hover:border-neo-orange group-hover:text-neo-orange transition-colors z-10">
-                                    <FileText className="w-5 h-5 text-neutral-400 group-hover:text-neo-orange transition-colors" />
-                                </div>
-                                <h3 className="text-xl font-bold text-white mb-2">1. Upload</h3>
-                                <p className="text-neutral-500 leading-relaxed max-w-xs">
-                                    Drag & drop your course handouts, syllabus, or past exam papers. We support PDF and text formats.
-                                </p>
-                            </div>
-
-                            {/* Step 2 */}
-                            <div className="flex flex-col items-center text-center group">
-                                <div className="w-12 h-12 bg-black border border-neutral-800 rounded-full flex items-center justify-center mb-6 group-hover:border-neo-orange group-hover:text-neo-orange transition-colors z-10">
-                                    <Zap className="w-5 h-5 text-neutral-400 group-hover:text-neo-orange transition-colors" />
-                                </div>
-                                <h3 className="text-xl font-bold text-white mb-2">2. Analyze</h3>
-                                <p className="text-neutral-500 leading-relaxed max-w-xs">
-                                    Our RAG engine (powered by Groq Llama-3) dissects the content, extracting topics and learning outcomes.
-                                </p>
-                            </div>
-
-                            {/* Step 3 */}
-                            <div className="flex flex-col items-center text-center group">
-                                <div className="w-12 h-12 bg-black border border-neutral-800 rounded-full flex items-center justify-center mb-6 group-hover:border-neo-orange group-hover:text-neo-orange transition-colors z-10">
-                                    <BarChart3 className="w-5 h-5 text-neutral-400 group-hover:text-neo-orange transition-colors" />
-                                </div>
-                                <h3 className="text-xl font-bold text-white mb-2">3. Execute</h3>
-                                <p className="text-neutral-500 leading-relaxed max-w-xs">
-                                    Access your personalized dashboard. Chat with your syllabus. Track high-yield topics.
-                                </p>
-                            </div>
-                        </div>
+            {/* Workflow Section (No Panels) */}
+            <section className="py-32 px-4 relative z-10">
+                <div className="max-w-6xl mx-auto">
+                    <div className="text-center mb-16">
+                        <h2 className="text-3xl md:text-4xl font-black text-white uppercase tracking-tighter">
+                            From PDF to <span className="text-neo-orange">Intelligence</span>
+                        </h2>
+                        <p className="text-neutral-500 mt-4 font-mono">Three steps to exam dominance.</p>
                     </div>
-                </section>
 
-                {/* Project Details / Tech Stack (No Panels) */}
-                <section className="py-20 px-4 border-t border-neutral-900 bg-black/40">
-                    <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-16">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-12 relative">
+                        {/* Connecting Line (Desktop) */}
+                        <div className="hidden md:block absolute top-6 left-0 w-full h-px bg-neutral-800 -z-10" />
 
-                        {/* Left: Mission */}
-                        <div className="md:w-1/2 space-y-6">
-                            <div className="inline-flex items-center gap-2 text-neo-orange font-mono text-xs uppercase tracking-widest mb-2">
-                                <BrainCircuit className="w-4 h-4" />
-                                <span>System Architecture</span>
+                        {/* Step 1 */}
+                        <div className="flex flex-col items-center text-center group">
+                            <div className="w-12 h-12 bg-black border border-neutral-800 rounded-full flex items-center justify-center mb-6 group-hover:border-neo-orange group-hover:text-neo-orange transition-colors z-10">
+                                <FileText className="w-5 h-5 text-neutral-400 group-hover:text-neo-orange transition-colors" />
                             </div>
-                            <h2 className="text-4xl font-bold text-white leading-tight">
-                                Built for speed.<br />
-                                Engineered for <span className="text-neutral-500">accuracy.</span>
-                            </h2>
-                            <p className="text-neutral-400 text-lg leading-relaxed">
-                                Exam Intel isn't just a PDF reader. It's a semantic search engine designed specifically for the MUJ curriculum.
-                                By combining vector databases with Large Language Models, we close the gap between "what's in the book" and "what's on the test."
+                            <h3 className="text-xl font-bold text-white mb-2">1. Upload</h3>
+                            <p className="text-neutral-500 leading-relaxed max-w-xs">
+                                Drag & drop your course handouts, syllabus, or past exam papers. We support PDF and text formats.
                             </p>
-                            <div className="flex gap-4 pt-4">
-                                <a href="https://github.com/D-art9/exam-intel-pbl" target="_blank" rel="noopener noreferrer" className="text-white hover:text-neo-orange underline decoration-neutral-700 underline-offset-4 transition-colors">
-                                    View Source on GitHub
-                                </a>
-                            </div>
                         </div>
 
-                        {/* Right: Stack Grid */}
-                        <div className="md:w-1/2 grid grid-cols-2 gap-x-12 gap-y-10">
-                            <div>
-                                <h4 className="text-white font-bold mb-3 flex items-center gap-2">
-                                    <span className="w-2 h-2 bg-blue-500 rounded-full"></span> Frontend
-                                </h4>
-                                <p className="text-neutral-500 text-sm">
-                                    React + Vite for lightning-fast rendering. Tailwind CSS for the Neo-Brutalist design system.
-                                </p>
+                        {/* Step 2 */}
+                        <div className="flex flex-col items-center text-center group">
+                            <div className="w-12 h-12 bg-black border border-neutral-800 rounded-full flex items-center justify-center mb-6 group-hover:border-neo-orange group-hover:text-neo-orange transition-colors z-10">
+                                <Zap className="w-5 h-5 text-neutral-400 group-hover:text-neo-orange transition-colors" />
                             </div>
-                            <div>
-                                <h4 className="text-white font-bold mb-3 flex items-center gap-2">
-                                    <span className="w-2 h-2 bg-green-500 rounded-full"></span> Backend
-                                </h4>
-                                <p className="text-neutral-500 text-sm">
-                                    Django REST Framework. Robust, scalable, and secure API architecture.
-                                </p>
+                            <h3 className="text-xl font-bold text-white mb-2">2. Analyze</h3>
+                            <p className="text-neutral-500 leading-relaxed max-w-xs">
+                                Our RAG engine (powered by Groq Llama-3) dissects the content, extracting topics and learning outcomes.
+                            </p>
+                        </div>
+
+                        {/* Step 3 */}
+                        <div className="flex flex-col items-center text-center group">
+                            <div className="w-12 h-12 bg-black border border-neutral-800 rounded-full flex items-center justify-center mb-6 group-hover:border-neo-orange group-hover:text-neo-orange transition-colors z-10">
+                                <BarChart3 className="w-5 h-5 text-neutral-400 group-hover:text-neo-orange transition-colors" />
                             </div>
-                            <div>
-                                <h4 className="text-white font-bold mb-3 flex items-center gap-2">
-                                    <span className="w-2 h-2 bg-purple-500 rounded-full"></span> Intelligence
-                                </h4>
-                                <p className="text-neutral-500 text-sm">
-                                    Groq API running Llama-3-70b for near-instant inference. LangChain for RAG orchestration.
-                                </p>
-                            </div>
-                            <div>
-                                <h4 className="text-white font-bold mb-3 flex items-center gap-2">
-                                    <span className="w-2 h-2 bg-yellow-500 rounded-full"></span> Memory
-                                </h4>
-                                <p className="text-neutral-500 text-sm">
-                                    PostgreSQL + pgvector. Semester-long retention of document embeddings.
-                                </p>
-                            </div>
+                            <h3 className="text-xl font-bold text-white mb-2">3. Execute</h3>
+                            <p className="text-neutral-500 leading-relaxed max-w-xs">
+                                Access your personalized dashboard. Chat with your syllabus. Track high-yield topics.
+                            </p>
                         </div>
                     </div>
-                </section>
+                </div>
+            </section>
+
+            {/* Project Details / Tech Stack (No Panels) */}
+            <section className="py-20 px-4 border-t border-neutral-900 bg-black/40">
+                <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-16">
+
+                    {/* Left: Mission */}
+                    <div className="md:w-1/2 space-y-6">
+                        <div className="inline-flex items-center gap-2 text-neo-orange font-mono text-xs uppercase tracking-widest mb-2">
+                            <BrainCircuit className="w-4 h-4" />
+                            <span>System Architecture</span>
+                        </div>
+                        <h2 className="text-4xl font-bold text-white leading-tight">
+                            Built for speed.<br />
+                            Engineered for <span className="text-neutral-500">accuracy.</span>
+                        </h2>
+                        <p className="text-neutral-400 text-lg leading-relaxed">
+                            Exam Intel isn't just a PDF reader. It's a semantic search engine designed specifically for the MUJ curriculum.
+                            By combining vector databases with Large Language Models, we close the gap between "what's in the book" and "what's on the test."
+                        </p>
+                        <div className="flex gap-4 pt-4">
+                            <a href="https://github.com/D-art9/exam-intel-pbl" target="_blank" rel="noopener noreferrer" className="text-white hover:text-neo-orange underline decoration-neutral-700 underline-offset-4 transition-colors">
+                                View Source on GitHub
+                            </a>
+                        </div>
+                    </div>
+
+                    {/* Right: Stack Grid */}
+                    <div className="md:w-1/2 grid grid-cols-2 gap-x-12 gap-y-10">
+                        <div>
+                            <h4 className="text-white font-bold mb-3 flex items-center gap-2">
+                                <span className="w-2 h-2 bg-blue-500 rounded-full"></span> Frontend
+                            </h4>
+                            <p className="text-neutral-500 text-sm">
+                                React + Vite for lightning-fast rendering. Tailwind CSS for the Neo-Brutalist design system.
+                            </p>
+                        </div>
+                        <div>
+                            <h4 className="text-white font-bold mb-3 flex items-center gap-2">
+                                <span className="w-2 h-2 bg-green-500 rounded-full"></span> Backend
+                            </h4>
+                            <p className="text-neutral-500 text-sm">
+                                Django REST Framework. Robust, scalable, and secure API architecture.
+                            </p>
+                        </div>
+                        <div>
+                            <h4 className="text-white font-bold mb-3 flex items-center gap-2">
+                                <span className="w-2 h-2 bg-purple-500 rounded-full"></span> Intelligence
+                            </h4>
+                            <p className="text-neutral-500 text-sm">
+                                Groq API running Llama-3-70b for near-instant inference. LangChain for RAG orchestration.
+                            </p>
+                        </div>
+                        <div>
+                            <h4 className="text-white font-bold mb-3 flex items-center gap-2">
+                                <span className="w-2 h-2 bg-yellow-500 rounded-full"></span> Memory
+                            </h4>
+                            <p className="text-neutral-500 text-sm">
+                                PostgreSQL + pgvector. Semester-long retention of document embeddings.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
     );
 }

@@ -26,8 +26,8 @@ export function FlowPage() {
     return (
         <div className="container mx-auto py-12 px-4">
             <div className="text-center mb-12 space-y-4">
-                <h1 className="text-4xl font-bold text-gray-900">How It Works</h1>
-                <p className="text-gray-800 text-lg">The automated workflow for academic compliance.</p>
+                <h1 className="text-4xl font-bold text-white">How It Works</h1>
+                <p className="text-neutral-400 text-lg">The automated workflow for academic compliance.</p>
             </div>
 
             <div className="flex flex-col md:flex-row items-center justify-center gap-8 relative">
@@ -39,7 +39,7 @@ export function FlowPage() {
                                 <div className={`w-16 h-16 mx-auto rounded-2xl flex items-center justify-center shadow-lg mb-4 ${step.color}`}>
                                     {step.icon}
                                 </div>
-                                <CardTitle className="text-xl">{step.title}</CardTitle>
+                                <CardTitle className="text-xl text-black">{step.title}</CardTitle>
                             </CardHeader>
                             <CardContent className="text-center">
                                 <p className="text-gray-600">{step.desc}</p>

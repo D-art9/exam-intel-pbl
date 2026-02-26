@@ -14,7 +14,8 @@ export function DashboardPage({ isEmbedded = false, documentId: propDocId }) {
     const { data: outcomes, isLoading: outcomesLoading } = useQuery({
         queryKey: ['lectureOutcomes', documentId],
         queryFn: async () => {
-            const response = await axios.get(`http://127.0.0.1:8000/api/documents/${documentId}/lecture_outcomes/`);
+            const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
+            const response = await axios.get(`${API_URL}/api/documents/${documentId}/lecture_outcomes/`);
             return response.data;
         },
         enabled: !!documentId,
@@ -26,7 +27,8 @@ export function DashboardPage({ isEmbedded = false, documentId: propDocId }) {
         queryFn: async () => {
             // Re-using the detail endpoint if available, or just mocking title if not easily accessible without a dedicated endpoint
             // Assuming standard DRF ModelViewSet retrieve endpoint exists
-            const response = await axios.get(`http://127.0.0.1:8000/api/documents/${documentId}/`);
+            const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
+            const response = await axios.get(`${API_URL}/api/documents/${documentId}/`);
             return response.data;
         },
         enabled: !!documentId,

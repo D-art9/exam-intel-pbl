@@ -75,56 +75,58 @@ export function LandingPage() {
                 </div>
             </section>
 
-            {/* Magic Bento Grid */}
-            <section className="py-20 px-4 max-w-7xl mx-auto w-full z-10">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[250px]">
+            {/* Open Features Grid (No Panels) */}
+            <section className="py-24 px-4 relative z-10">
+                <div className="max-w-7xl mx-auto">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
 
-                    {/* Large Card */}
-                    <NeoCard className="md:col-span-2 row-span-1 md:row-span-2 p-8 flex flex-col justify-between group overflow-hidden" glow>
-                        <div className="absolute top-0 right-0 p-8 opacity-20 group-hover:opacity-40 transition-opacity">
-                            <BrainCircuit className="w-64 h-64 text-neo-orange rotate-12" />
-                        </div>
-                        <div>
-                            <div className="w-12 h-12 bg-neo-orange rounded-none flex items-center justify-center mb-4 shadow-neo">
-                                <Zap className="w-6 h-6 text-black" />
+                        {/* Feature 1: High Yield */}
+                        <div className="space-y-4 group">
+                            <div className="w-14 h-14 bg-neo-orange/10 rounded-full flex items-center justify-center text-neo-orange mb-4 group-hover:bg-neo-orange/20 transition-colors">
+                                <Zap className="w-7 h-7" />
                             </div>
-                            <h3 className="text-3xl font-bold text-white mb-2">High-Yield Topics</h3>
-                            <p className="text-neutral-400 text-lg">Our AI analyzes past papers to identify the topics that appear most frequently. Stop studying blindly.</p>
+                            <h3 className="text-2xl font-bold text-white">High-Yield Topics</h3>
+                            <p className="text-neutral-400 text-lg leading-relaxed">
+                                Our AI analyzes past papers to identify the topics that appear most frequently. Stop studying blindly.
+                            </p>
                         </div>
-                        <div className="mt-8">
-                            <div className="h-2 w-full bg-neutral-800 rounded-full overflow-hidden">
-                                <div className="h-full bg-neo-orange w-3/4 animate-pulse" />
+
+                        {/* Feature 2: Syllabus Aligned */}
+                        <div className="space-y-4 group">
+                            <div className="w-14 h-14 bg-blue-500/10 rounded-full flex items-center justify-center text-blue-500 mb-4 group-hover:bg-blue-500/20 transition-colors">
+                                <ShieldCheck className="w-7 h-7" />
                             </div>
-                            <div className="flex justify-between text-xs text-neutral-500 mt-2 font-mono">
-                                <span>ANALYSIS CONFIDENCE</span>
-                                <span>98.5%</span>
-                            </div>
+                            <h3 className="text-2xl font-bold text-white">Syllabus Aligned</h3>
+                            <p className="text-neutral-400 text-lg leading-relaxed">
+                                100% compliant with MUJ curriculum. We ensure every topic generated maps directly to your course outcomes (CLOs) and program outcomes (PLOs).
+                            </p>
                         </div>
-                    </NeoCard>
 
-                    {/* Small Card 1 */}
-                    <NeoCard className="p-6 flex flex-col justify-center items-center text-center hover:bg-neo-surface/80">
-                        <ShieldCheck className="w-12 h-12 text-neo-orange mb-4" />
-                        <h3 className="text-xl font-bold text-white">Syllabus Aligned</h3>
-                        <p className="text-sm text-neutral-500 mt-2">100% compliant with MUJ curriculum.</p>
-                    </NeoCard>
+                        {/* Feature 3: Pattern Recognition */}
+                        <div className="space-y-4 group">
+                            <div className="w-14 h-14 bg-green-500/10 rounded-full flex items-center justify-center text-green-500 mb-4 group-hover:bg-green-500/20 transition-colors">
+                                <BarChart3 className="w-7 h-7" />
+                            </div>
+                            <h3 className="text-2xl font-bold text-white">Pattern Recognition</h3>
+                            <p className="text-neutral-400 text-lg leading-relaxed">
+                                The system detects repeated question formats and styles from previous years to predict potential exam questions with high accuracy.
+                            </p>
+                        </div>
 
-                    {/* Small Card 2 */}
-                    <NeoCard className="p-6 flex flex-col justify-center items-center text-center hover:bg-neo-surface/80">
-                        <BarChart3 className="w-12 h-12 text-white mb-4" />
-                        <h3 className="text-xl font-bold text-white">Pattern Recognition</h3>
-                        <p className="text-sm text-neutral-500 mt-2">Detects repeated question formats.</p>
-                    </NeoCard>
-
-                    {/* Medium Card */}
-                    <NeoCard className="md:col-span-1 p-8 flex flex-col justify-end bg-gradient-to-t from-neo-orange/10 to-transparent">
-                        <h3 className="text-2xl font-bold text-white mb-2">Archive Access</h3>
-                        <p className="text-neutral-400 text-sm mb-4">Browse complete B.Tech CSE curriculum.</p>
-                        <NeoButton variant="secondary" className="w-full text-xs py-2" onClick={() => navigate('/syllabus-archive')}>
-                            Browse Archive
-                        </NeoButton>
-                    </NeoCard>
-
+                        {/* Feature 4: Archive Access */}
+                        <div className="space-y-4 group">
+                            <div className="w-14 h-14 bg-purple-500/10 rounded-full flex items-center justify-center text-purple-500 mb-4 group-hover:bg-purple-500/20 transition-colors">
+                                <BookOpen className="w-7 h-7" />
+                            </div>
+                            <h3 className="text-2xl font-bold text-white">Archive Access</h3>
+                            <p className="text-neutral-400 text-lg leading-relaxed">
+                                Browse the complete B.Tech CSE curriculum history. Access syllabus PDFs from previous semesters instantly.
+                            </p>
+                            <button onClick={() => navigate('/syllabus-archive')} className="text-white hover:text-neo-orange underline decoration-neutral-700 underline-offset-4 transition-colors flex items-center gap-2 mt-2">
+                                Browse Archive <ArrowRight className="w-4 h-4" />
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </section>
 

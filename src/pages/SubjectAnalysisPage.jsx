@@ -32,7 +32,8 @@ export function SubjectAnalysisPage({ isEmbedded = false, documentId: propDocId 
     const { data: history } = useQuery({
         queryKey: ['chatHistory', documentId],
         queryFn: async () => {
-            const response = await axios.get(`http://127.0.0.1:8000/api/documents/${documentId}/history/`);
+            const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
+            const response = await axios.get(`${API_URL}/api/documents/${documentId}/history/`);
             return response.data;
         },
         enabled: !!documentId,
@@ -75,7 +76,8 @@ export function SubjectAnalysisPage({ isEmbedded = false, documentId: propDocId 
 
         try {
             console.log("Calling API...");
-            const response = await axios.post(`http://127.0.0.1:8000/api/documents/${documentId}/ask/`, {
+            const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
+            const response = await axios.post(`${API_URL}/api/documents/${documentId}/ask/`, {
                 question: userMessage.text
             });
 

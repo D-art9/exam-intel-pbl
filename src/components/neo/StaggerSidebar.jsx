@@ -1,7 +1,7 @@
 
 import { motion } from 'framer-motion';
 import { NavLink } from 'react-router-dom';
-import { Home, Upload, Brain, BarChart, Settings, Mail, Info } from 'lucide-react';
+import { Home, Upload, Brain, BarChart, Settings, Mail, Info, Cpu } from 'lucide-react';
 
 const sidebarVariants = {
     open: {
@@ -21,6 +21,7 @@ export function StaggerSidebar() {
         { path: '/', icon: Home, label: 'Home' },
         { path: '/upload', icon: Upload, label: 'Upload' },
         { path: '/analysis', icon: Brain, label: 'Brain' }, // Or whatever your analysis route is
+        { path: '/how-it-works', icon: Cpu, label: 'How It Works' },
         { path: '/about', icon: Info, label: 'About' },
         { path: '/contact', icon: Mail, label: 'Contact' },
     ];

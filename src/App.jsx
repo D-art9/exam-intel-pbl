@@ -11,6 +11,7 @@ import { SyllabusArchivePage } from './pages/SyllabusArchivePage';
 import { ContactPage } from './pages/ContactPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { SplitAnalysisPage } from './pages/SplitAnalysisPage';
+import { HowItWorksPage } from './pages/HowItWorksPage';
 
 
 
@@ -23,6 +24,7 @@ function App() {
         <Route path="analysis" element={<BrainPage />} />
         <Route path="about" element={<AboutPage />} />
         <Route path="contact" element={<ContactPage />} />
+        <Route path="how-it-works" element={<HowItWorksPage />} />
         <Route path="flow" element={<FlowPage />} />
         <Route path="subject-results/:documentId" element={<SubjectAnalysisPage />} />
         <Route path="dashboard/:documentId" element={<SplitAnalysisPage />} />

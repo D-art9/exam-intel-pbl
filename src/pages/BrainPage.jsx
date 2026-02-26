@@ -13,7 +13,8 @@ export function BrainPage() {
     const { data: documents = [], isLoading } = useQuery({
         queryKey: ['documents'],
         queryFn: async () => {
-            const response = await axios.get('http://127.0.0.1:8000/api/documents/');
+            const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
+            const response = await axios.get(`${API_URL}/api/documents/`);
             return response.data;
         }
     });

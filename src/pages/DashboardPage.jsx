@@ -130,47 +130,53 @@ export function DashboardPage({ isEmbedded = false, documentId: propDocId }) {
                         </span>
                     </div>
 
-                    <div className="grid gap-4">
+                    <div className="overflow-x-auto bg-neo-surface border border-neutral-800 rounded-xl shadow-2xl">
                         {outcomes?.length > 0 ? (
-                            outcomes.map((outcome, idx) => (
-                                <motion.div
-                                    key={idx}
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: idx * 0.05 }}
-                                >
-                                    <NeoCard className="p-5 hover:border-neo-orange transition-colors group">
-                                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                                            <div>
-                                                <div className="flex items-center gap-3 mb-2">
-                                                    <span className="bg-neutral-900 text-neo-orange text-xs font-bold px-2 py-1 rounded border border-neutral-800">
-                                                        LEC {outcome.lecture_number}
+                            <table className="w-full text-left text-sm text-neutral-300">
+                                <thead className="text-xs uppercase bg-black/50 text-neutral-400 border-b border-neutral-800">
+                                    <tr>
+                                        <th scope="col" className="px-6 py-4 font-bold tracking-wider">LEC</th>
+                                        <th scope="col" className="px-6 py-4 font-bold tracking-wider">Topic</th>
+                                        <th scope="col" className="px-6 py-4 font-bold tracking-wider hidden md:table-cell">Description</th>
+                                        <th scope="col" className="px-6 py-4 font-bold tracking-wider whitespace-nowrap">CO Mapped</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {outcomes.map((outcome, idx) => (
+                                        <motion.tr 
+                                            key={idx}
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ delay: idx * 0.02 }}
+                                            className="border-b border-neutral-800/50 hover:bg-white/5 transition-colors"
+                                        >
+                                            <td className="px-6 py-4 font-mono font-bold text-neo-orange whitespace-nowrap">
+                                                {outcome.lecture_number}
+                                            </td>
+                                            <td className="px-6 py-4 font-medium text-white max-w-xs md:max-w-md">
+                                                {outcome.topic}
+                                            </td>
+                                            <td className="px-6 py-4 text-neutral-400 hidden md:table-cell text-xs leading-relaxed max-w-sm">
+                                                {outcome.description || <span className="text-neutral-600 block italic">No detailed description</span>}
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                {outcome.co_mapped ? (
+                                                    <span className="bg-neutral-900 border border-neutral-700 text-neutral-300 text-xs px-2 py-1 rounded font-mono">
+                                                        {outcome.co_mapped}
                                                     </span>
-                                                    {outcome.co_mapped && (
-                                                        <span className="text-xs text-neutral-500 font-mono">
-                                                            CO: {outcome.co_mapped}
-                                                        </span>
-                                                    )}
-                                                </div>
-                                                <h4 className="text-white font-medium text-lg group-hover:text-neo-orange transition-colors">
-                                                    {outcome.topic}
-                                                </h4>
-                                                {outcome.description && (
-                                                    <p className="text-neutral-400 text-sm mt-1 leading-relaxed">
-                                                        {outcome.description}
-                                                    </p>
+                                                ) : (
+                                                    <span className="text-neutral-600">-</span>
                                                 )}
-                                            </div>
-
-                                        </div>
-                                    </NeoCard>
-                                </motion.div>
-                            ))
+                                            </td>
+                                        </motion.tr>
+                                    ))}
+                                </tbody>
+                            </table>
                         ) : (
-                            <NeoCard className="p-8 text-center border-dashed border-neutral-700">
+                            <div className="p-8 text-center border-dashed border-neutral-700">
                                 <p className="text-neutral-500">No structured lecture plan found in this document.</p>
                                 <p className="text-xs text-neutral-600 mt-2">Try uploading a syllabus document with a clear "Lecture Plan" table.</p>
-                            </NeoCard>
+                            </div>
                         )}
                     </div>
                 </div>

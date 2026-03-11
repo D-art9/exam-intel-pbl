@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { NeoButton, NeoCard } from '../components/neo/NeoComponents';
-import { ArrowLeft, Send, Bot, User, FileText, Sparkles, Terminal, Cpu } from 'lucide-react';
+import { ArrowLeft, Send, Bot, User, FileText, Sparkles, Terminal, Cpu, Menu, X } from 'lucide-react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import TextType from '../components/TextType'; // Import TextType
@@ -16,7 +16,7 @@ export function SubjectAnalysisPage({ isEmbedded = false, documentId: propDocId 
     ]);
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const [isFullScreen, setIsFullScreen] = useState(false);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const messagesEndRef = useRef(null);
 
     const scrollToBottom = () => {
@@ -66,8 +66,7 @@ export function SubjectAnalysisPage({ isEmbedded = false, documentId: propDocId 
             return;
         }
 
-        // Trigger full screen on first message if not already
-        if (!isFullScreen && !isEmbedded) setIsFullScreen(true);
+        // Removed old isFullScreen flag mechanic
 
         const userMessage = { role: 'user', text: input, isNew: true };
         setMessages(prev => [...prev, userMessage]);
@@ -103,72 +102,71 @@ export function SubjectAnalysisPage({ isEmbedded = false, documentId: propDocId 
     // ...
 
     return (
-        <div className={`flex h-[calc(100vh-6rem)] gap-6 animate-in fade-in duration-500 ${isEmbedded ? 'h-full p-0 gap-0' : ''}`}>
-            {/* Sidebar Context - HIDE if embedded to save space for split view */}
+        <div className={`flex h-[calc(100vh-6rem)] w-full relative animate-in fade-in duration-500 overflow-hidden ${isEmbedded ? 'h-full p-0' : ''}`}>
+            
+            {/* Pop-out Sidebar Drawer */}
             <AnimatePresence>
-                {!isFullScreen && !isEmbedded && (
-                    <motion.div
-                        initial={{ width: 320, opacity: 1 }}
-                        exit={{ width: 0, opacity: 0, overflow: 'hidden' }}
-                        animate={{ width: 320, opacity: 1 }}
-                        transition={{ duration: 0.4, ease: "easeInOut" }}
-                        className="hidden lg:flex flex-col gap-6 shrink-0"
-                    >
-                        <NeoButton variant="secondary" onClick={() => navigate('/upload')} className="w-full justify-start pl-4 gap-3 border-neutral-800 text-neutral-400 hover:text-white">
-                            <ArrowLeft className="w-4 h-4" /> Return to Upload
-                        </NeoButton>
-
-
-                        <NeoCard className="p-6 flex-1 bg-neo-surface border-neutral-800 flex flex-col items-center text-center">
-                            <div className="w-20 h-20 bg-neutral-900 rounded-full flex items-center justify-center mb-4 border border-neo-orange/20">
-                                <Cpu className="w-10 h-10 text-neo-orange" />
+                {isSidebarOpen && !isEmbedded && (
+                    <>
+                        <motion.div 
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setIsSidebarOpen(false)}
+                            className="absolute inset-0 bg-black/60 z-40 backdrop-blur-sm"
+                        />
+                        <motion.div
+                            initial={{ x: '-100%' }}
+                            animate={{ x: 0 }}
+                            exit={{ x: '-100%' }}
+                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                            className="absolute left-0 top-0 h-full w-80 bg-neo-surface border-r border-neutral-800 z-50 flex flex-col p-6 shadow-2xl"
+                        >
+                            <div className="flex justify-between items-center mb-8">
+                                <h3 className="text-white font-bold tracking-widest text-sm uppercase text-neutral-400">Options</h3>
+                                <button onClick={() => setIsSidebarOpen(false)} className="text-neutral-500 hover:text-white transition-colors">
+                                    <X className="w-6 h-6" />
+                                </button>
                             </div>
-                            <h2 className="text-xl font-bold text-white mb-2">Neural Link</h2>
-                            {/* ... sidebar content ... */}
-                            <div className="flex items-center gap-2 text-xs text-green-500 font-mono mb-6">
-                                <span className="relative flex h-2 w-2">
-                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                                </span>
-                                Active Connection
-                            </div>
+                            
+                            <NeoButton variant="secondary" onClick={() => navigate('/upload')} className="w-full justify-start pl-4 gap-3 border-neutral-800 text-white hover:border-neo-orange mb-3">
+                                <ArrowLeft className="w-5 h-5" /> Return to Upload
+                            </NeoButton>
+                            
+                            <NeoButton variant="secondary" onClick={() => navigate(`/lecture-plan/${documentId}`)} className="w-full justify-start pl-4 gap-3 border-neutral-800 text-white hover:border-neo-orange mb-6 bg-neo-orange/10 border-neo-orange/30">
+                                <FileText className="w-5 h-5 text-neo-orange" /> Extract Lecture Plan
+                            </NeoButton>
 
-                            <div className="w-full text-left space-y-4">
-                                <div className="p-3 bg-black/50 border border-neutral-800 rounded">
-                                    <p className="text-xs text-neutral-500 uppercase">Document ID</p>
-                                    <p className="text-xs text-white font-mono truncate">{documentId}</p>
-                                </div>
-                                <div className="p-3 bg-black/50 border border-neutral-800 rounded">
-                                    <p className="text-xs text-neutral-500 uppercase">Model</p>
-                                    <p className="text-sm text-neo-orange font-bold font-mono">Llama-3-70B</p>
-                                </div>
+                            <div className="mt-auto pt-6 border-t border-neutral-800">
+                                <p className="text-xs text-neutral-500 uppercase font-bold tracking-wider mb-2">Current Document ID</p>
+                                <p className="text-xs text-neutral-300 break-all bg-black/50 p-3 rounded border border-neutral-800 font-mono">{documentId}</p>
                             </div>
-                        </NeoCard>
-                    </motion.div>
+                        </motion.div>
+                    </>
                 )}
             </AnimatePresence>
 
-            {/* Chat Interface */}
-            <div className={`flex-1 flex flex-col h-full bg-neo-black border border-neutral-800 rounded-xl overflow-hidden shadow-2xl relative ${isEmbedded ? 'rounded-none border-0' : ''}`}>
+            {/* Chat Interface (Always Full Screen) */}
+            <div className={`flex-1 flex flex-col h-full bg-neo-black border-0 md:border md:border-neutral-800 md:rounded-xl overflow-hidden shadow-2xl relative w-full ${isEmbedded ? 'rounded-none border-0' : ''}`}>
 
                 {/* Header */}
-                <div className="h-16 border-b border-neutral-800 flex items-center px-6 bg-neo-surface/80 backdrop-blur justify-between">
-                    <div className="flex items-center gap-3">
-                        <Terminal className="w-5 h-5 text-neo-orange" />
-                        <span className="font-bold text-white tracking-wide">COMMAND TERMINAL</span>
-                    </div>
-                    {!isEmbedded && (
-                        <div className="flex items-center gap-4">
-                            <button
-                                type="button"
-                                onClick={() => setIsFullScreen(!isFullScreen)}
-                                className="text-xs font-mono text-neutral-500 hover:text-neo-orange transition-colors uppercase"
-                            >
-                                {isFullScreen ? '[ Restore View ]' : '[ Maximize ]'}
+                <div className="h-16 border-b border-neutral-800 flex items-center px-4 md:px-6 bg-neo-surface/80 backdrop-blur justify-between z-10 w-full">
+                    <div className="flex items-center gap-4">
+                        {!isEmbedded && (
+                            <button onClick={() => setIsSidebarOpen(true)} className="text-neutral-400 hover:text-neo-orange transition-colors p-1 group">
+                                <Menu className="w-6 h-6 group-hover:drop-shadow-[0_0_8px_rgba(255,85,0,0.8)]" />
                             </button>
-                            <div className="text-xs font-mono text-neutral-500">v2.4.0</div>
+                        )}
+                        <Terminal className="w-5 h-5 text-neo-orange" />
+                        <span className="font-bold text-white tracking-wide text-lg font-sans">COMMAND TERMINAL</span>
+                    </div>
+                    
+                    <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 px-3 py-1.5 bg-neo-orange/10 border border-neo-orange/20 rounded-full shadow-inner">
+                            <Sparkles className="w-4 h-4 text-emerald-400" />
+                            <span className="text-xs md:text-sm font-bold text-emerald-400 tracking-wide font-sans">LLaMA-3-70B</span>
                         </div>
-                    )}
+                    </div>
                 </div>
 
 
@@ -182,10 +180,10 @@ export function SubjectAnalysisPage({ isEmbedded = false, documentId: propDocId 
                                 </div>
                             )}
 
-                            <div className={`max-w-[80%] rounded-lg p-4 font-mono text-sm leading-relaxed
+                            <div className={`max-w-[85%] rounded-xl p-5 font-sans text-base leading-relaxed tracking-wide shadow-sm
                                 ${msg.role === 'user'
-                                    ? 'bg-neo-orange/10 border border-neo-orange/30 text-neo-orange'
-                                    : 'bg-neutral-900 border border-neutral-800 text-neutral-300'}
+                                    ? 'bg-neo-orange/10 border border-neo-orange/20 text-white'
+                                    : 'bg-neutral-900 border border-neutral-800 text-neutral-100'}
                             `}>
                                 {msg.role === 'assistant' ? (
                                     <TextType
@@ -236,8 +234,8 @@ export function SubjectAnalysisPage({ isEmbedded = false, documentId: propDocId 
                         <div className="flex-1 relative">
                             <input
                                 type="text"
-                                placeholder="Enter command or query..."
-                                className="w-full bg-black border border-neutral-700 rounded-lg px-4 py-4 pr-12 text-sm text-white font-mono focus:outline-none focus:border-neo-orange focus:ring-1 focus:ring-neo-orange transition-all placeholder:text-neutral-600"
+                                placeholder="Ask a question about the document..."
+                                className="w-full bg-black border border-neutral-700 rounded-xl px-5 py-4 pr-12 text-base text-white font-sans focus:outline-none focus:border-neo-orange focus:ring-1 focus:ring-neo-orange transition-all placeholder:text-neutral-500 shadow-inner"
                                 value={input}
                                 onChange={(e) => setInput(e.target.value)}
                                 disabled={isLoading}

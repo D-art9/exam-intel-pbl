@@ -99,3 +99,16 @@ class DocumentViewSet(viewsets.ModelViewSet):
             })
             
         return Response(outcomes)
+
+    @action(detail=True, methods=['post'])
+    def generate_plan(self, request, pk=None):
+        """
+        Endpoint to explicitly re-run the Lecture Plan prompt.
+        POST /api/documents/{id}/generate_plan/
+        """
+        document = self.get_object()
+        from .rag_service import generate_lecture_plan
+        plan = generate_lecture_plan(document.id)
+        if plan is None:
+            return Response({"error": "Failed to generate plan"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response(plan)

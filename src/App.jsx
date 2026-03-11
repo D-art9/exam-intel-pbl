@@ -12,6 +12,7 @@ import { ContactPage } from './pages/ContactPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { SplitAnalysisPage } from './pages/SplitAnalysisPage';
 import { HowItWorksPage } from './pages/HowItWorksPage';
+import { LecturePlanChatPage } from './pages/LecturePlanChatPage';
 
 
 
@@ -28,6 +29,7 @@ function App() {
         <Route path="flow" element={<FlowPage />} />
         <Route path="subject-results/:documentId" element={<SubjectAnalysisPage />} />
         <Route path="dashboard/:documentId" element={<SplitAnalysisPage />} />
+        <Route path="lecture-plan/:documentId" element={<LecturePlanChatPage />} />
         <Route path="syllabus-archive" element={<SyllabusArchivePage />} />
 
 

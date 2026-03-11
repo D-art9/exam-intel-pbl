@@ -34,13 +34,14 @@ export function StaggerSidebar() {
             variants={sidebarVariants}
         >
             {/* Logo Area */}
-            <motion.div variants={itemVariants} className="px-6 mb-12">
-                <div className="h-10 w-10 bg-neo-orange rounded-none shadow-neo flex items-center justify-center">
-                    <span className="font-bold text-neo-black text-xl">EI</span>
-                </div>
-                <h1 className="hidden md:block mt-4 text-2xl font-bold tracking-tighter text-white">
-                    EXAM<span className="text-neo-orange">INTEL</span>
-                </h1>
+            <motion.div variants={itemVariants} className="px-6 mb-10 flex justify-center md:justify-start">
+                <NavLink to="/">
+                    <img 
+                        src="/logo.png" 
+                        alt="ExamIntel Logo" 
+                        className="h-16 md:h-20 lg:h-24 w-auto object-contain hover:scale-105 transition-transform" 
+                    />
+                </NavLink>
             </motion.div>
 
             {/* Menu Items */}

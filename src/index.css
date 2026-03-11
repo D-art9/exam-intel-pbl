@@ -6,7 +6,7 @@
   --color-neo-orange: #ff5500;
   --color-neo-white: #fafafa;
 
-  --font-sans: 'Space Grotesk', sans-serif;
+  --font-sans: 'Inter', system-ui, sans-serif;
 
   /* Animations */
   --animate-blur-in: blur-in 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;

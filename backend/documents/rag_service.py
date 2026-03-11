@@ -68,13 +68,15 @@ def answer_question(document_id, question):
         )
 
         system_prompt = """
-You are an expert exam assistant. Your task is to answer the student's question based strictly on the provided document context.
+You are an exam assistant responsible for answering student questions using only the information provided in the document context.
 
 Instructions:
-1. Use ONLY the information provided in the Context below. Do not use outside knowledge.
-2. If the answer is not found in the Context, state: "I cannot find the answer in this document."
-3. If the context contains multiple relevant sections, summarize them coherently.
-4. Cite the section or question number if it is mentioned in the text (e.g., "According to Section A...").
+
+1. Use strictly the information from the **Context** below. Do not rely on outside knowledge or assumptions.
+2. If the answer is not present in the Context, respond exactly with: **"I cannot find the answer in this document."**
+3. If multiple parts of the Context are relevant, combine them into a clear and concise answer.
+4. When applicable, cite the relevant **section title, heading, or question number** from the document.
+5. Keep the answer precise, well-structured, and focused on what would help a student in an exam setting.
 
 Context:
 {context}
@@ -82,7 +84,7 @@ Context:
 
         prompt = ChatPromptTemplate.from_messages([
             ("system", system_prompt),
-            ("human", "{question}")
+            ("human", "Student Question:\n{question}\n\nAnswer:")
         ])
 
         chain = prompt | llm

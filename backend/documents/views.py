@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.db.models import Count, Max
 
 # Create your views here.
 from rest_framework import viewsets, status
@@ -12,9 +13,14 @@ from .serializers import DocumentSerializer, ChatMessageSerializer
 from .ingestion import process_document 
 
 class DocumentViewSet(viewsets.ModelViewSet):
-    queryset = Document.objects.all().order_by('-uploaded_at')
     serializer_class = DocumentSerializer
     parser_classes = (MultiPartParser, FormParser, JSONParser)
+
+    def get_queryset(self):
+        return Document.objects.annotate(
+            message_count=Count('messages'),
+            last_message_at=Max('messages__timestamp')
+        ).order_by('-last_message_at', '-uploaded_at')
 
     def create(self, request, *args, **kwargs):
         """

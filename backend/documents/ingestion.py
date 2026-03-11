@@ -2,7 +2,6 @@ import os
 import re
 import pymupdf4llm
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_huggingface import HuggingFaceEmbeddings
 from django.conf import settings
 from .models import Document, DocumentChunk
 
@@ -63,6 +62,7 @@ def process_document(doc_id):
         full_text = pymupdf4llm.to_markdown(file_path)
         
         chunks_to_create = []
+        from langchain_huggingface import HuggingFaceEmbeddings
         embedding_model = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
 
         # --- SECTION 1: LECTURE PLAN (Structured Table) ---

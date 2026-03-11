@@ -56,16 +56,16 @@ export function HowItWorksPage() {
                     <motion.div
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        className="inline-block px-4 py-1 rounded-full bg-neutral-900 border border-neutral-800 text-xs font-mono text-neo-primary mb-6"
+                        className="inline-block px-6 py-2 rounded-full bg-neutral-900 border border-neutral-800 text-xs font-mono text-white font-bold tracking-widest uppercase mb-8"
                     >
                         SYSTEM ARCHITECTURE & WORKFLOW
                     </motion.div>
 
-                    <h1 className="text-4xl md:text-6xl font-display font-black mb-6 uppercase tracking-tight">
-                        Under the <span className="text-transparent bg-clip-text bg-gradient-to-r from-neo-primary to-neo-accent">Hood</span>
+                    <h1 className="text-5xl md:text-8xl font-sans font-black mb-8 uppercase tracking-tighter text-white flex justify-center items-center flex-wrap gap-x-4">
+                        UNDER THE <span className="bg-neo-orange text-black px-4 py-1 leading-none">HOOD</span>
                     </h1>
 
-                    <p className="text-neutral-400 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
+                    <p className="text-neutral-400 text-lg md:text-2xl max-w-4xl mx-auto leading-relaxed font-sans">
                         A detailed technical breakdown of how Exam Intel ingests, processes, and understands your academic curriculum using RAG (Retrieval-Augmented Generation).
                     </p>
                 </div>

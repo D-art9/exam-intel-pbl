@@ -1,16 +1,21 @@
 import os
 import time
-from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 from django.conf import settings
 from .models import DocumentChunk
 from pgvector.django import L2Distance, CosineDistance
 
-# Load embedding model (same one used for ingestion)
-print("[RAG Init] Loading embedding model...")
-embedding_model = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
-print("[RAG Init] Embedding model loaded successfully.")
+_embedding_model = None
+
+def get_embedding_model():
+    global _embedding_model
+    if _embedding_model is None:
+        from langchain_huggingface import HuggingFaceEmbeddings
+        print("[RAG Init] Loading embedding model...")
+        _embedding_model = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+        print("[RAG Init] Embedding model loaded successfully.")
+    return _embedding_model
 
 def answer_question(document_id, question):
     """
@@ -27,7 +32,7 @@ def answer_question(document_id, question):
         # 1. Embed Question
         print(f"Step 1: Embedding question...")
         t0 = time.time()
-        question_vector = embedding_model.embed_query(question)
+        question_vector = get_embedding_model().embed_query(question)
         print(f"   -> Embedded in {time.time() - t0:.4f}s. Vector length: {len(question_vector)}")
 
         # 2. Semantic Search (Supabase pgvector)

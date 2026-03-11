@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useQuery } from '@tanstack/react-query'; // Import useQuery
 import { NeoCard, NeoButton } from '../components/neo/NeoComponents';
-import { Brain, FileText, Calendar, MessageSquare, ArrowRight, Search, RefreshCw, X, Menu, Settings, Filter } from 'lucide-react';
+import { Brain, FileText, Calendar, MessageSquare, ArrowRight, Search, RefreshCw, X, Menu, Settings, Filter, Trash2, Zap } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export function BrainPage() {
@@ -35,6 +35,33 @@ export function BrainPage() {
             (activeCategory === 'syllabi' && (doc.title || '').toLowerCase().includes('syllabus'));
         return matchesSearch && matchesCategory;
     });
+
+    const handleDelete = async (id, e) => {
+        e.stopPropagation();
+        if (!confirm('Are you sure you want to delete this memory? This cannot be undone.')) return;
+        
+        try {
+            const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
+            await axios.delete(`${API_URL}/api/documents/${id}/`);
+            refetch();
+        } catch (err) {
+            alert('Failed to delete document.');
+        }
+    };
+
+    const handleReProcess = async (id, e) => {
+        e.stopPropagation();
+        try {
+            const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
+            // We'll reuse the create logic or a specific reprocess endpoint if we had one
+            // For now, let's just trigger generate_plan which is our 'heavy' task
+            await axios.post(`${API_URL}/api/documents/${id}/generate_plan/`);
+            refetch();
+            alert('Re-processing triggered!');
+        } catch (err) {
+            alert('Failed to re-process.');
+        }
+    };
 
     const container = {
         hidden: { opacity: 0 },
@@ -186,17 +213,35 @@ export function BrainPage() {
                                                 <div className="p-2 bg-neutral-900 rounded border border-neutral-800 group-hover:border-neo-orange transition-colors">
                                                     <FileText className="w-6 h-6 text-neutral-400 group-hover:text-neo-orange" />
                                                 </div>
-                                                <span className={`px-2 py-1 text-xs font-bold uppercase rounded border ${doc.status === 'completed' ? 'bg-green-500/10 text-green-500 border-green-500/20' :
-                                                    doc.status === 'processing' ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20' :
-                                                        'bg-red-500/10 text-red-500 border-red-500/20'
-                                                    }`}>
-                                                    {doc.status}
-                                                </span>
+                                                <div className="flex items-center gap-2">
+                                                    <button 
+                                                        onClick={(e) => handleDelete(doc.id, e)}
+                                                        className="p-1.5 text-neutral-600 hover:text-red-500 hover:bg-red-500/10 rounded transition-all"
+                                                        title="Delete Memory"
+                                                    >
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
+                                                    <span className={`px-2 py-1 text-[10px] font-black uppercase rounded border ${doc.status === 'completed' ? 'bg-green-500/10 text-green-500 border-green-500/20' :
+                                                        doc.status === 'processing' ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20' :
+                                                            'bg-red-500/10 text-red-500 border-red-500/20'
+                                                        }`}>
+                                                        {doc.status}
+                                                    </span>
+                                                </div>
                                             </div>
 
                                             <h3 className="text-xl font-bold text-white mb-2 line-clamp-2 group-hover:text-neo-orange transition-colors">
                                                 {doc.title || "Untitled Document"}
                                             </h3>
+
+                                            {doc.status === 'failed' && (
+                                                <button 
+                                                    onClick={(e) => handleReProcess(doc.id, e)}
+                                                    className="w-full mt-2 py-2 bg-neo-orange/10 border border-neo-orange/30 text-neo-orange text-[10px] font-black uppercase tracking-widest rounded hover:bg-neo-orange hover:text-white transition-all flex items-center justify-center gap-2"
+                                                >
+                                                    <Zap className="w-3 h-3" /> Re-Process Document
+                                                </button>
+                                            )}
 
                                             <div className="space-y-3 mt-6">
                                                 <div className="flex items-center justify-between text-[10px] font-mono uppercase tracking-widest text-neutral-500">

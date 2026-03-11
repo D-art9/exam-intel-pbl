@@ -153,13 +153,26 @@ def process_document(doc_id):
                 "metadata": {"section": "general_text", "chunk_id": i}
             })
 
+        if not chunks_to_create:
+            print("!!! CRITICAL: No text could be extracted.")
+            doc.status = 'failed'
+            doc.save()
+            return False
+
         print(f"Total Chunks prepared: {len(chunks_to_create)}")
         
-        # 4. Generate Embeddings & Save
-        print("Generating embeddings...")
+        # 4. Generate Embeddings & Save (Batch processing for memory safety)
+        print("Generating embeddings in batches...")
         texts = [c['text'] for c in chunks_to_create]
-        embeddings = embedding_model.embed_documents(texts)
         
+        batch_size = 32
+        all_embeddings = []
+        for i in range(0, len(texts), batch_size):
+            batch = texts[i:i + batch_size]
+            batch_embeddings = embedding_model.embed_documents(batch)
+            all_embeddings.extend(batch_embeddings)
+            print(f"   -> Embedded batch {(i//batch_size) + 1}")
+
         db_chunks = []
         for idx, item in enumerate(chunks_to_create):
             db_chunks.append(DocumentChunk(
@@ -167,16 +180,21 @@ def process_document(doc_id):
                 chunk_index=idx,
                 text_content=item['text'],
                 metadata=item['metadata'],
-                embedding=embeddings[idx]
+                embedding=all_embeddings[idx]
             ))
             
+        # Clear any existing partial data before saving new
+        doc.chunks.all().delete()
         DocumentChunk.objects.bulk_create(db_chunks)
 
         # 5. Generate Lecture Plan (Groq)
         try:
             print("Triggering AI Lecture Plan Generation...")
             from .rag_service import generate_lecture_plan
-            generate_lecture_plan(doc.id)
+            plan = generate_lecture_plan(doc.id)
+            if plan:
+                doc.generated_lecture_plan = plan
+                print("   -> Success: Lecture Plan saved.")
         except Exception as e:
             print(f"Warning: Failed to generate lecture plan: {e}")
 

@@ -11,10 +11,13 @@ _embedding_model = None
 def get_embedding_model():
     global _embedding_model
     if _embedding_model is None:
-        from langchain_huggingface import HuggingFaceEmbeddings
-        print("[RAG Init] Loading embedding model...")
-        _embedding_model = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
-        print("[RAG Init] Embedding model loaded successfully.")
+        # We switch to Inference API to save memory on Render
+        from langchain_huggingface import HuggingFaceEndpointEmbeddings
+        print("[RAG Init] Using HuggingFace Inference API for embeddings...")
+        _embedding_model = HuggingFaceEndpointEmbeddings(
+            model="sentence-transformers/all-MiniLM-L6-v2",
+            huggingfacehub_api_token=settings.HUGGINGFACEHUB_API_TOKEN
+        )
     return _embedding_model
 
 def answer_question(document_id, question):

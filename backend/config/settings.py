@@ -163,3 +163,4 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 # AI Keys
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
+HUGGINGFACEHUB_API_TOKEN = os.environ.get("HUGGINGFACEHUB_API_TOKEN")

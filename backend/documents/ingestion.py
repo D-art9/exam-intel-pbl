@@ -62,8 +62,8 @@ def process_document(doc_id):
         full_text = pymupdf4llm.to_markdown(file_path)
         
         chunks_to_create = []
-        from langchain_huggingface import HuggingFaceEmbeddings
-        embedding_model = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+        from .rag_service import get_embedding_model
+        embedding_model = get_embedding_model()
 
         # --- SECTION 1: LECTURE PLAN (Structured Table) ---
         # Look for "Lecture Plan" header

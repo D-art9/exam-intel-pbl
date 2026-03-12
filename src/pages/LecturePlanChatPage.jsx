@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { NeoButton, NeoCard } from '../components/neo/NeoComponents';
-import { ArrowLeft, Send, Bot, User, FileText, Sparkles, Terminal, Cpu, Menu, X } from 'lucide-react';
+import { ArrowLeft, Send, Bot, User, FileText, Sparkles, Terminal, Cpu, Menu, X, Maximize2 } from 'lucide-react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import TextType from '../components/TextType'; // Import TextType
@@ -232,16 +232,28 @@ Do not include markdown formatting (like \`\`\`json). Just the raw JSON string.`
                                 ) : msg.role === 'assistant' && msg.tableData ? (
                                     <div className="space-y-4">
                                         <div className="flex justify-between items-center mb-2">
-                                            <p className="text-emerald-400 font-mono text-sm">{msg.text}</p>
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                                                <p className="text-emerald-400 font-mono text-sm tracking-tighter uppercase">{msg.text}</p>
+                                            </div>
                                             <NeoButton 
                                                 variant="secondary" 
-                                                className="text-xs py-1.5 px-3 border border-neo-orange/30 text-neo-orange hover:bg-neo-orange hover:text-black gap-2 transition-colors"
+                                                className="text-[10px] py-1 px-4 border border-neo-orange/30 text-neo-orange hover:bg-neo-orange hover:text-black gap-2 transition-all font-black uppercase tracking-widest shadow-[0_0_15px_rgba(255,85,0,0.1)] hover:shadow-[0_0_20px_rgba(255,85,0,0.4)]"
                                                 onClick={() => setTableModalData(msg.tableData)}
                                             >
-                                                Expand Table View
+                                                <Maximize2 className="w-3.4 h-3.5" />
+                                                Go Fullscreen
                                             </NeoButton>
                                         </div>
-                                        <div className="overflow-x-auto bg-black/50 border border-neutral-800 rounded-lg max-h-96">
+                                        <div className="group relative overflow-x-auto bg-black/60 border border-neutral-800 rounded-xl max-h-[32rem] shadow-inner transition-all hover:border-neutral-700">
+                                            {/* Corner Maximize Icon */}
+                                            <button 
+                                                onClick={() => setTableModalData(msg.tableData)}
+                                                className="absolute top-4 right-4 z-20 p-2 bg-black/80 border border-neutral-700 rounded-lg text-neutral-400 hover:text-neo-orange hover:border-neo-orange opacity-0 group-hover:opacity-100 transition-all backdrop-blur-md"
+                                                title="Expand to Fullscreen"
+                                            >
+                                                <Maximize2 className="w-4 h-4" />
+                                            </button>
                                             <table className="w-full text-left text-sm text-neutral-300">
                                                 <thead className="text-xs uppercase bg-black/80 text-neutral-400 border-b border-neutral-800">
                                                     <tr>

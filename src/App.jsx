@@ -23,6 +23,7 @@ function App() {
         <Route index element={<LandingPage />} />
         <Route path="upload" element={<UploadPage />} />
         <Route path="analysis" element={<BrainPage />} />
+        <Route path="processing/:documentId" element={<AnalysisPage />} />
         <Route path="about" element={<AboutPage />} />
         <Route path="contact" element={<ContactPage />} />
         <Route path="how-it-works" element={<HowItWorksPage />} />

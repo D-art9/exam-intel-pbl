@@ -1,14 +1,24 @@
+import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { NeoButton, NeoCard } from '../components/neo/NeoComponents';
-import { ArrowLeft, BookOpen, GraduationCap, LayoutDashboard, BrainCircuit, Share2 } from 'lucide-react';
+import { ArrowLeft, BookOpen, GraduationCap, LayoutDashboard, BrainCircuit, Share2, Maximize2, X, FileText, RotateCw } from 'lucide-react';
 import axios from 'axios';
-import { motion } from 'framer-motion';
-import { useQuery } from '@tanstack/react-query';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 export function DashboardPage({ isEmbedded = false, documentId: propDocId }) {
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
     const { documentId: paramDocId } = useParams();
     const documentId = propDocId || paramDocId;
+    const [showTableModal, setShowTableModal] = useState(false);
+    const [isRefreshing, setIsRefreshing] = useState(false);
+
+    const handleRefresh = async () => {
+        setIsRefreshing(true);
+        await queryClient.invalidateQueries(['lectureOutcomes', documentId]);
+        setTimeout(() => setIsRefreshing(false), 1000);
+    };
 
     // Fetch Lecture Outcomes
     const { data: outcomes, isLoading: outcomesLoading } = useQuery({
@@ -106,13 +116,23 @@ export function DashboardPage({ isEmbedded = false, documentId: propDocId }) {
                             Overview
                         </h3>
                         <div className="space-y-4">
-                            <div className="bg-black/40 p-3 rounded border border-neutral-800">
-                                <span className="text-xs text-neutral-500 block uppercase">Total Lectures</span>
-                                <span className="text-2xl font-mono text-white">{outcomes?.length || 0}</span>
+                            <div className="bg-black/40 p-3 rounded border border-neutral-800 flex justify-between items-center group/item hover:border-neo-orange transition-colors">
+                                <div>
+                                    <span className="text-xs text-neutral-500 block uppercase tracking-tighter">Total Lectures</span>
+                                    <span className="text-2xl font-mono text-white">{outcomes?.length || 0}</span>
+                                </div>
+                                <NeoButton 
+                                    variant="ghost" 
+                                    size="sm" 
+                                    onClick={() => setShowTableModal(true)}
+                                    className="p-2 text-neutral-500 hover:text-neo-orange hover:bg-neo-orange/10 border-0"
+                                >
+                                    <Maximize2 className="w-5 h-5" />
+                                </NeoButton>
                             </div>
                             <div className="bg-black/40 p-3 rounded border border-neutral-800">
-                                <span className="text-xs text-neutral-500 block uppercase">Processing Engine</span>
-                                <span className="text-sm font-mono text-white">Hybrid-RAG v2.0</span>
+                                <span className="text-xs text-neutral-500 block uppercase tracking-tighter">Processing Engine</span>
+                                <span className="text-sm font-mono text-white tracking-widest">Hybrid-RAG v2.0</span>
                             </div>
                         </div>
                     </NeoCard>
@@ -125,9 +145,26 @@ export function DashboardPage({ isEmbedded = false, documentId: propDocId }) {
                             <GraduationCap className="w-6 h-6 text-neo-orange" />
                             Lecture Outcomes
                         </h2>
-                        <span className="text-xs font-mono text-neutral-500 px-2 py-1 bg-neutral-900 rounded border border-neutral-800">
-                            EXTRACTED DATA
-                        </span>
+                        <div className="flex items-center gap-3">
+                            <NeoButton 
+                                variant="secondary"
+                                onClick={handleRefresh}
+                                className="p-2 border-neutral-800 hover:border-neo-orange text-white"
+                                title="Refresh Data"
+                            >
+                                <RotateCw className={`w-3 h-3 ${isRefreshing ? 'animate-spin' : ''}`} />
+                            </NeoButton>
+                            <NeoButton 
+                                variant="secondary"
+                                onClick={() => setShowTableModal(true)}
+                                className="text-[10px] py-1 px-3 border-neutral-800 hover:border-neo-orange text-white gap-2 uppercase tracking-widest font-black"
+                            >
+                                <Maximize2 className="w-3 h-3" /> Go Fullscreen
+                            </NeoButton>
+                            <span className="text-xs font-mono text-neutral-500 px-2 py-1 bg-neutral-900 rounded border border-neutral-800 hidden sm:block">
+                                EXTRACTED
+                            </span>
+                        </div>
                     </div>
 
                     <div className="overflow-x-auto bg-neo-surface border border-neutral-800 rounded-xl shadow-2xl">
@@ -181,6 +218,83 @@ export function DashboardPage({ isEmbedded = false, documentId: propDocId }) {
                     </div>
                 </div>
             </div>
+
+            {/* Fullscreen Table Modal */}
+            <AnimatePresence>
+                {showTableModal && (
+                    <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-md p-4 md:p-8"
+                    >
+                        <motion.div 
+                            initial={{ scale: 0.95, y: 20 }}
+                            animate={{ scale: 1, y: 0 }}
+                            exit={{ scale: 0.95, y: 20 }}
+                            className="bg-neo-black border border-neutral-800 rounded-2xl w-full max-w-7xl max-h-[95vh] flex flex-col shadow-[0_0_50px_rgba(0,0,0,0.5)] overflow-hidden"
+                        >
+                            <div className="flex justify-between items-center p-6 border-b border-neutral-800 bg-neo-surface">
+                                <div className="flex items-center gap-4">
+                                    <div className="p-2 bg-neo-orange/10 rounded-lg">
+                                        <FileText className="text-neo-orange w-6 h-6" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-xl font-black text-white tracking-tighter uppercase">
+                                            FULL CURRICULUM DATA
+                                        </h3>
+                                        <p className="text-xs font-mono text-neutral-500 uppercase tracking-widest">{documentData?.title}</p>
+                                    </div>
+                                </div>
+                                <button 
+                                    onClick={() => setShowTableModal(false)}
+                                    className="p-3 text-neutral-500 hover:text-white bg-neutral-900 hover:bg-neutral-800 rounded-xl transition-all border border-neutral-800 hover:border-neutral-700"
+                                >
+                                    <X className="w-6 h-6" />
+                                </button>
+                            </div>
+
+                            <div className="flex-1 overflow-auto p-0 scrollbar-hide">
+                                <table className="w-full text-left text-sm text-neutral-300 border-collapse">
+                                    <thead className="sticky top-0 z-10 text-xs uppercase bg-neutral-900/95 backdrop-blur text-neutral-400 border-b border-neutral-800">
+                                        <tr>
+                                            <th className="px-8 py-5 font-bold tracking-widest">Lec</th>
+                                            <th className="px-8 py-5 font-bold tracking-widest w-1/4">Topic</th>
+                                            <th className="px-8 py-5 font-bold tracking-widest">Detailed Session Description</th>
+                                            <th className="px-8 py-5 font-bold tracking-widest whitespace-nowrap">CO Mapping</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-neutral-800/50">
+                                        {outcomes.map((row, i) => (
+                                            <tr key={i} className="hover:bg-white/5 transition-colors group">
+                                                <td className="px-8 py-6 font-mono text-neo-orange font-black text-lg">{row.lecture_number}</td>
+                                                <td className="px-8 py-6">
+                                                    <span className="text-white font-bold text-base block mb-1 tracking-tight">{row.topic}</span>
+                                                </td>
+                                                <td className="px-8 py-6 text-neutral-400 text-sm leading-relaxed max-w-2xl font-sans">
+                                                    {row.description || <span className="italic text-neutral-600">No content extracted for this session.</span>}
+                                                </td>
+                                                <td className="px-8 py-6 whitespace-nowrap">
+                                                    {row.co_mapped ? (
+                                                        <span className="bg-neo-orange/10 border border-neo-orange/20 text-neo-orange px-3 py-1.5 rounded-lg font-mono text-xs font-bold ring-1 ring-neo-orange/5">
+                                                            {row.co_mapped}
+                                                        </span>
+                                                    ) : <span className="text-neutral-700 font-mono">-</span>}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <div className="p-4 bg-neo-surface border-t border-neutral-800 flex justify-end">
+                                <span className="text-[10px] font-mono text-neutral-600 uppercase tracking-[0.2em]">Generated via Hybrid-RAG v2.0 • Data Compliant</span>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }
+

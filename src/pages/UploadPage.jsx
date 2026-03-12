@@ -28,7 +28,7 @@ export function UploadPage() {
             });
             console.log("Upload Success:", response.data);
             if (response.data.id) {
-                navigate(`/dashboard/${response.data.id}`);
+                navigate(`/processing/${response.data.id}`);
             }
 
         } catch (error) {

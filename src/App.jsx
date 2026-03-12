@@ -13,6 +13,7 @@ import { DashboardPage } from './pages/DashboardPage';
 import { SplitAnalysisPage } from './pages/SplitAnalysisPage';
 import { HowItWorksPage } from './pages/HowItWorksPage';
 import { LecturePlanChatPage } from './pages/LecturePlanChatPage';
+import { AnalysisPage } from './pages/AnalysisPage';
 
 
 

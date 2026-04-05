@@ -1,7 +1,6 @@
-
-import { motion } from 'framer-motion';
-import { NavLink } from 'react-router-dom';
-import { Home, Upload, Brain, BarChart, Settings, Mail, Info, Cpu } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { NavLink, useLocation } from 'react-router-dom';
+import { Home, Upload, Brain, BarChart, Settings, Mail, Info, Cpu, FileText, Target, ShieldCheck } from 'lucide-react';
 
 const sidebarVariants = {
     open: {
@@ -17,13 +16,16 @@ const itemVariants = {
 };
 
 export function StaggerSidebar() {
+    const location = useLocation();
+    const mode = location.state?.mode || 'handout';
+    const documentId = location.state?.documentId;
+
     const links = [
         { path: '/', icon: Home, label: 'Home' },
-        { path: '/upload', icon: Upload, label: 'Upload' },
-        { path: '/analysis', icon: Brain, label: 'Brain' }, // Or whatever your analysis route is
+        { path: '/upload', icon: Upload, label: 'Upload', state: location.state },
+        { path: '/analysis', icon: Brain, label: 'Brain', state: location.state },
         { path: '/how-it-works', icon: Cpu, label: 'How It Works' },
         { path: '/about', icon: Info, label: 'About' },
-        { path: '/contact', icon: Mail, label: 'Contact' },
     ];
 
     return (
@@ -44,12 +46,35 @@ export function StaggerSidebar() {
                 </NavLink>
             </motion.div>
 
+            {/* Mode Indicator Badge */}
+            <AnimatePresence mode="wait">
+                <motion.div 
+                    key={mode}
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    className="px-6 mb-6"
+                >
+                    <div className={`
+                        flex items-center gap-2 px-3 py-2 border rounded-none text-[10px] uppercase font-black tracking-widest
+                        ${mode === 'smart-paper' 
+                            ? 'border-neo-orange/30 bg-neo-orange/5 text-neo-orange shadow-[0_0_10px_rgba(255,85,0,0.1)]' 
+                            : 'border-neutral-800 bg-neutral-900/50 text-neutral-500'}
+                    `}>
+                        <div className={`w-1.5 h-1.5 rounded-full ${mode === 'smart-paper' ? 'bg-neo-orange animate-pulse' : 'bg-neutral-700'}`} />
+                        {mode === 'smart-paper' ? 'Smart Paper Mode' : 'Handout Mode'}
+                    </div>
+                </motion.div>
+            </AnimatePresence>
+
             {/* Menu Items */}
             <div className="flex-1 space-y-2 px-3">
+                {/* Regular Links */}
                 {links.map((link) => (
                     <motion.div key={link.path} variants={itemVariants}>
                         <NavLink
                             to={link.path}
+                            state={link.state}
                             className={({ isActive }) => `
                                 group flex items-center gap-4 px-4 py-3 rounded-none transition-all duration-300 border-l-2
                                 ${isActive
@@ -62,6 +87,32 @@ export function StaggerSidebar() {
                         </NavLink>
                     </motion.div>
                 ))}
+
+                {/* Conditional Smart Paper Link */}
+                <AnimatePresence>
+                    {mode === 'smart-paper' && documentId && (
+                        <motion.div 
+                            initial={{ opacity: 0, x: -20, height: 0 }}
+                            animate={{ opacity: 1, x: 0, height: 'auto' }}
+                            exit={{ opacity: 0, x: -20, height: 0 }}
+                            variants={itemVariants}
+                        >
+                            <NavLink
+                                to={`/paper-generator/${documentId}`}
+                                state={{ mode, documentId }}
+                                className={({ isActive }) => `
+                                    group flex items-center gap-4 px-4 py-3 rounded-none transition-all duration-300 border-l-2
+                                    ${isActive
+                                        ? 'border-neo-orange bg-neo-surface text-neo-orange'
+                                        : 'border-transparent text-neutral-500 hover:text-white hover:bg-white/5'}
+                                `}
+                            >
+                                <FileText className="w-5 h-5 group-hover:drop-shadow-[0_0_10px_#FF5500] text-neo-orange" />
+                                <span className="hidden md:block font-bold tracking-widest uppercase text-xs">Paper Generator</span>
+                            </NavLink>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </div>
 
             {/* Footer / User */}

@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { Layout } from './components/layout/Layout';
 import { LandingPage } from './pages/LandingPage';
 import { UploadPage } from './pages/UploadPage';
@@ -14,6 +14,8 @@ import { SplitAnalysisPage } from './pages/SplitAnalysisPage';
 import { HowItWorksPage } from './pages/HowItWorksPage';
 import { LecturePlanChatPage } from './pages/LecturePlanChatPage';
 import { AnalysisPage } from './pages/AnalysisPage';
+import ModeSelection from './pages/ModeSelection';
+import { PaperGenerator } from './pages/PaperGenerator';
 
 
 
@@ -21,8 +23,10 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<Layout />}>
-        <Route index element={<LandingPage />} />
+        <Route index element={<Navigate to="/mode-selection" replace />} />
+        <Route path="mode-selection" element={<ModeSelection />} />
         <Route path="upload" element={<UploadPage />} />
+        <Route path="paper-generator/:documentId" element={<PaperGenerator />} />
         <Route path="analysis" element={<BrainPage />} />
         <Route path="processing/:documentId" element={<AnalysisPage />} />
         <Route path="about" element={<AboutPage />} />

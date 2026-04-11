@@ -1,17 +1,42 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BookOpen, FileQuestion, ChevronRight, Zap, Target } from 'lucide-react';
+import { BookOpen, FileQuestion, ChevronRight, Zap, Target, Loader2, Play } from 'lucide-react';
 import { NeoCard, NeoButton } from '../components/neo/NeoComponents';
 import { cn } from '../lib/utils';
+import axios from 'axios';
 
 export default function ModeSelection() {
   const [selectedMode, setSelectedMode] = useState(null);
+  const [isDemoLoading, setIsDemoLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleContinue = () => {
     if (selectedMode) {
       navigate('/upload', { state: { mode: selectedMode } });
+    }
+  };
+
+  const handleDemo = async () => {
+    setIsDemoLoading(true);
+    try {
+      const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
+      const response = await axios.post(`${API_URL}/api/pyq/demo/`);
+      if (response.data.syllabus_id) {
+        // Automatically route to the generator with the demo syllabus ID
+        navigate(`/paper-generator/${response.data.syllabus_id}`, {
+          state: { 
+            mode: 'smart-paper', 
+            documentId: response.data.syllabus_id,
+            is_demo: true 
+          }
+        });
+      }
+    } catch (error) {
+      console.error("Demo Failed:", error);
+      alert("Demo initialization failed. Please ensure the backend is running.");
+    } finally {
+      setIsDemoLoading(false);
     }
   };
 
@@ -113,21 +138,38 @@ export default function ModeSelection() {
         ))}
       </div>
 
-      <div className="h-24 mt-12 flex items-center justify-center">
+      <div className="mt-12">
         <AnimatePresence>
           {selectedMode && (
             <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 10 }}
+              className="flex flex-col md:flex-row items-center gap-6"
             >
               <NeoButton
                 onClick={handleContinue}
-                className="group px-12 py-4 flex items-center gap-3 text-lg"
+                disabled={isDemoLoading}
+                className="group px-12 py-4 flex items-center gap-3 text-lg w-full md:w-auto"
               >
                 Continue to Mission
                 <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </NeoButton>
+
+              {selectedMode === 'smart-paper' && (
+                <button
+                  onClick={handleDemo}
+                  disabled={isDemoLoading}
+                  className="px-8 py-3 bg-neutral-900/50 border-2 border-neutral-800 hover:border-neo-orange text-neutral-500 hover:text-neo-orange font-black uppercase tracking-[0.2em] text-[10px] flex items-center gap-2 transition-all group shadow-lg"
+                >
+                  {isDemoLoading ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <Play className="w-3.5 h-3.5 group-hover:fill-neo-orange shadow-[0_0_10px_rgba(255,85,0,0)] group-hover:shadow-[0_0_15px_rgba(255,85,0,0.4)] transition-all" />
+                  )}
+                  {isDemoLoading ? 'Seeding Neural Payload...' : 'Launch Demo Mission'}
+                </button>
+              )}
             </motion.div>
           )}
         </AnimatePresence>

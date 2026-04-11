@@ -24,16 +24,51 @@ class DocumentViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         """
-        Handle file upload and trigger ingestion synchronously.
+        Handle file upload. Detects .docx and converts to PDF if necessary.
         """
+        file_obj = request.data.get('file')
+        
+        # 1. Detection: Handle Word Documents
+        if file_obj and file_obj.name.endswith('.docx'):
+            from .converter import convert_docx_to_pdf
+            from django.core.files.base import ContentFile
+            import os
+
+            # Read raw bytes from the uploaded file
+            content = file_obj.read()
+            
+            # Convert to a temporary PDF file
+            pdf_path = convert_docx_to_pdf(content)
+            
+            if pdf_path:
+                try:
+                    with open(pdf_path, 'rb') as f:
+                        # Create the document instance with the CONVERTED PDF
+                        new_name = file_obj.name.replace('.docx', '.pdf')
+                        doc = Document.objects.create(
+                            title=new_name,
+                            file=ContentFile(f.read(), name=new_name)
+                        )
+                    
+                    # Manual trigger of ingestion
+                    process_document(doc.id)
+                    serializer = self.get_serializer(doc)
+                    return Response(serializer.data, status=status.HTTP_201_CREATED)
+                finally:
+                    # Local cleanup of the temporary converted PDF
+                    if os.path.exists(pdf_path):
+                        os.remove(pdf_path)
+            else:
+                return Response({"error": "Failed to convert Word document to PDF."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        # 2. Standard Logic for PDFs
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             doc = serializer.save()
-            
-            # TRIGGER INGESTION HERE (Synchronous for now)
             process_document(doc.id)
-            
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=True, methods=['post'])
     def ask(self, request, pk=None):

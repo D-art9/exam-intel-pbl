@@ -18,7 +18,8 @@ export default function PYQUploadZone({
     e.preventDefault();
     setIsDragging(false);
     if (e.dataTransfer.files) {
-      const droppedFiles = Array.from(e.dataTransfer.files).filter(f => f.type === 'application/pdf');
+      const allowedTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+      const droppedFiles = Array.from(e.dataTransfer.files).filter(f => allowedTypes.includes(f.type));
       if (maxFiles && files.length + droppedFiles.length > maxFiles) {
         alert(`Maximum ${maxFiles} files allowed.`);
         return;
@@ -69,7 +70,7 @@ export default function PYQUploadZone({
             type="file"
             id={`pyq-upload-${title}`}
             className="hidden"
-            accept=".pdf"
+            accept=".pdf,.docx"
             multiple={!maxFiles || maxFiles > 1}
             onChange={(e) => {
               if (e.target.files) {

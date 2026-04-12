@@ -39,6 +39,20 @@ class DocumentChunk(models.Model):
     class Meta:
         ordering = ['chunk_index']
 
+class PYQQuestion(models.Model): # FIXED: Added Managed Model
+    """Represents an extracted question from a Previous Year Paper""" # FIXED
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) # FIXED
+    question_text = models.TextField() # FIXED
+    source_paper = models.CharField(max_length=255) # FIXED
+    year = models.IntegerField(null=True, blank=True) # FIXED
+    exam_type = models.CharField(max_length=50, null=True, blank=True) # FIXED
+    marks = models.IntegerField(null=True, blank=True) # FIXED
+    question_number = models.CharField(max_length=20) # FIXED
+    embedding = VectorField(dimensions=384, null=True, blank=True) # FIXED
+
+    class Meta: # FIXED
+        unique_together = ('source_paper', 'question_number') # FIXED
+
 class ChatMessage(models.Model):
     """
     Stores individual chat messages for a document conversation.

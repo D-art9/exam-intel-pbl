@@ -132,18 +132,22 @@ def coverage(request):
     syllabus_id = request.query_params.get('syllabus_id')
     if not syllabus_id:
         return Response({"error": "syllabus_id required"}, status=400)
+
+    matrix_list = get_coverage_matrix(syllabus_id) # FIXED: Receives array
     
-    matrix = get_coverage_matrix(syllabus_id)
-    if not matrix:
-        return Response({"summary": {"total_outcomes": 0, "covered": 0, "blind_spots": 0, "high_freq_count": 0}, "matrix": {}})
+    if not matrix_list:
+        return Response({"summary": {"total_outcomes": 0, "covered": 0, "blind_spots": 0}, "matrix": []})
         
+    # Calculate summary from the list
+    summary = { # FIXED: Calculate from array
+        "total_outcomes": len(matrix_list),
+        "blind_spots": sum(1 for item in matrix_list if item["blind_spot"]),
+        "high_freq_count": sum(1 for item in matrix_list if item["is_high_frequency"])
+    }
+    
     return Response({
-        "summary": {
-            "total_outcomes": len(matrix),
-            "blind_spots": sum(1 for m in matrix.values() if m.get("blind_spot")),
-            "high_freq_count": sum(1 for m in matrix.values() if m.get("high_freq"))
-        },
-        "matrix": matrix
+        "summary": summary,
+        "matrix": matrix_list # FIXED: Returns as flat array
     })
 
 @api_view(['POST'])

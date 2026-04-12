@@ -6,7 +6,7 @@ from rest_framework import viewsets, status
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from .models import Document, ChatMessage
+from .models import Document, ChatMessage # FIXED: Cleaned imports
 from .serializers import DocumentSerializer, ChatMessageSerializer
 
 # Import the ingestion logic (we'll ensure this file exists in Step 5)

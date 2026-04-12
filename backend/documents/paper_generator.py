@@ -1,4 +1,5 @@
 import os
+import tempfile # FIXED: Using tempfile
 import datetime
 from dataclasses import dataclass, field
 from typing import List, Optional
@@ -47,36 +48,29 @@ def generate_paper(config: PaperConfig, syllabus_id: str) -> str:
         )
 
         # 2. Fetch coverage matrix
-        coverage_matrix = get_coverage_matrix(syllabus_id)
-        
-        # 2. Get syllabus chunks for outcome ordering and data
-        outcomes = DocumentChunk.objects.filter(
-            document_id=syllabus_id, 
-            metadata__section='lecture_plan'
-        ).order_by('chunk_index')
+        coverage_list = get_coverage_matrix(syllabus_id) # FIXED: Matrix is now a list
         
         selected_questions = []
         used_pyq_ids = set()
         source_papers = set()
         
-        # 3. Greedy Selection Strategy
+        # 4. Greedy Selection Strategy
         # Iterate over sections to fill specified counts
         for section in config.sections:
             section_questions = []
             
             # Reset used outcomes tracker for each section or overall? 
             # We'll try to rotate through outcomes for better coverage.
-            for outcome in outcomes:
+            for item in coverage_list: # FIXED: Iterate through list
                 if len(section_questions) >= section.count:
                     break
                     
-                outcome_id = str(outcome.id)
-                data = coverage_matrix.get(outcome_id, {"matches": [], "blind_spot": True})
-                
                 # Filter matches by requested marks
+                # FIXED: Force integer comparison for marks filter
                 valid_matches = [
-                    m for m in data.get("matches", []) 
-                    if m['marks'] == section.marks_per_q and m['id'] not in used_pyq_ids
+                    m for m in item.get("matches", []) 
+                    if m['marks'] is not None and int(m['marks']) == int(section.marks_per_q) # FIXED
+                    and m['id'] not in used_pyq_ids
                 ]
                 
                 if valid_matches:
@@ -86,20 +80,20 @@ def generate_paper(config: PaperConfig, syllabus_id: str) -> str:
                     section_questions.append({
                         "text": best_match['question_text'],
                         "marks": best_match['marks'],
-                        "tags": ["★ HIGH FREQ"] if data.get("high_freq") else [],
+                        "tags": ["★ HIGH FREQ"] if item.get("is_high_frequency") else [],
                         "type": "PYQ",
                         "source": best_match['source_paper']
                     })
                     used_pyq_ids.add(best_match['id'])
                     source_papers.add(best_match['source_paper'])
-                elif config.cover_all_outcomes or data.get("blind_spot"):
+                elif config.cover_all_outcomes or item.get("blind_spot"):
                     # 4. Blind-spot fallback (Using pre-initialized Groq client)
                     try:
                         messages = [
                             {"role": "system", "content": "You are an exam question writer."},
                             {"role": "user", "content": 
                                 f"Generate a {section.marks_per_q}-mark exam question that tests "
-                                f"this learning outcome: {outcome.text_content}. "
+                                f"this learning outcome: {item.get('topic')}. "
                                 f"Return the question text only. No preamble. No numbering."
                             }
                         ]
@@ -125,13 +119,8 @@ def generate_paper(config: PaperConfig, syllabus_id: str) -> str:
             })
             
         # 5. Render PDF with reportlab
-        output_dir = "outputs"
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
-            
-        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"{config.title.lower().replace(' ', '_')}_{timestamp}.pdf"
-        filepath = os.path.join(output_dir, filename)
+        # FIXED: Use tempfile for PDF creation
+        fd, filepath = tempfile.mkstemp(suffix=".pdf", prefix="exam_") # FIXED
         
         doc = SimpleDocTemplate(filepath, pagesize=A4)
         styles = getSampleStyleSheet()
@@ -168,7 +157,14 @@ def generate_paper(config: PaperConfig, syllabus_id: str) -> str:
             elements.append(Paragraph(f"Questions sourced from: {', '.join(sources_list)}", styles['Small']))
             
         doc.build(elements)
+        os.close(fd) # FIXED: Close file descriptor
         return filepath
+        
+    except Exception as e:
+        print(f"Error generating paper: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return None
         
     except Exception as e:
         print(f"Error generating paper: {str(e)}")

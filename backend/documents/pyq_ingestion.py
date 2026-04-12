@@ -102,8 +102,18 @@ def ingest_pyq(file_path):
         return
 
     # 2. Extract Questions
+    print(f"--- [EXTRACT DEBUG] Markdown Snippet: {markdown_text[:150].replace('\n', ' ')}...")
     extracted = extract_questions(markdown_text)
-    print(f"Extracted {len(extracted)} questions.")
+    
+    # NEW FALLBACK: If regex fails, don't return 0. Use the full text as one giant context chunk.
+    if not extracted:
+        print("!!! WARNING: Regex extraction found 0 questions. Using full paper body as fallback.")
+        extracted = [{
+            'num': 'FULL_PAPER',
+            'text': f"Full Paper Content ({filename}):\n" + markdown_text[:8000]
+        }]
+    
+    print(f"Extracted {len(extracted)} question blocks.")
 
     # 3. Embed and Save
     embedding_model = get_embedding_model()

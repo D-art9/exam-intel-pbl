@@ -17,6 +17,32 @@ export default function PaperConfigForm({ onSubmit, isGenerating }) {
     cover_all_outcomes: true
   });
 
+  const applyPreset = (type) => {
+    if (type === 'MID') {
+      setConfig(prev => ({
+        ...prev,
+        title: 'Mid Term Internal Exam',
+        total_marks: 30,
+        sections: [
+          { type: 'short', marks_per_q: 2, count: 5 },
+          { type: 'medium', marks_per_q: 5, count: 2 },
+          { type: 'long', marks_per_q: 10, count: 1 }
+        ]
+      }));
+    } else {
+      setConfig(prev => ({
+        ...prev,
+        title: 'End Semester University Exam',
+        total_marks: 80,
+        sections: [
+          { type: 'short', marks_per_q: 2, count: 10 },
+          { type: 'medium', marks_per_q: 5, count: 6 },
+          { type: 'long', marks_per_q: 10, count: 3 }
+        ]
+      }));
+    }
+  };
+
   const cumulativeMarks = config.sections.reduce((sum, sec) => sum + (sec.marks_per_q * sec.count), 0);
   const isMarksValid = cumulativeMarks === config.total_marks;
 
@@ -51,6 +77,35 @@ export default function PaperConfigForm({ onSubmit, isGenerating }) {
   return (
     <form onSubmit={handleFormSubmit} className="space-y-8 pb-12">
       
+      {/* MISSION PRESETS */}
+      <div className="grid grid-cols-2 gap-4 mb-8">
+        <button
+          type="button"
+          onClick={() => applyPreset('MID')}
+          className={cn(
+            "p-6 border-2 flex flex-col items-center gap-2 transition-all group",
+            config.total_marks === 30 ? "border-neo-orange bg-neo-orange/10" : "border-neutral-800 bg-neutral-900/50 grayscale hover:grayscale-0 hover:border-neutral-700"
+          )}
+        >
+          <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-neutral-500">Preset Option A</span>
+          <span className="text-xl font-black text-white italic group-hover:text-neo-orange transition-colors">MID TERM</span>
+          <span className="text-neo-orange font-bold font-mono">30 MARKS</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => applyPreset('END')}
+          className={cn(
+            "p-6 border-2 flex flex-col items-center gap-2 transition-all group",
+            config.total_marks === 80 ? "border-neo-orange bg-neo-orange/10" : "border-neutral-800 bg-neutral-900/50 grayscale hover:grayscale-0 hover:border-neutral-700"
+          )}
+        >
+          <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-neutral-500">Preset Option B</span>
+          <span className="text-xl font-black text-white italic group-hover:text-neo-orange transition-colors">END TERM</span>
+          <span className="text-neo-orange font-bold font-mono">80 MARKS</span>
+        </button>
+      </div>
+
       {/* Title & Basic Meta */}
       <div className="space-y-4">
         <label className="block space-y-2">

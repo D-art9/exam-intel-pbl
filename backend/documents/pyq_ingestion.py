@@ -45,12 +45,12 @@ def extract_questions(markdown_text):
     Extracts questions from the markdown using boundary regex.
     Handles hierarchy (parent question + subparts).
     """
-    # Patterns for question boundaries: Q1., 1), (i), (a)
+    # Patterns for question boundaries: Q1., 1), Question 1, [1]
     boundaries = [
-        r'^Q\d+\..*',   # Q1.
-        r'^\d+\).*',    # 1)
-        r'^\(i\).*',    # (i)
-        r'^\([a-z]\).*'  # (a)
+        r'^\s*(?:Q|Question|Q.)\s*\d+[\.\:]?.*',   # Q1., Question 1:, Q.1
+        r'^\s*\d+[\)\.].*',                        # 1) or 1.
+        r'^\s*\[\d+\]\s*.*',                       # [1]
+        r'^\s*\(?[a-z]\)?\..*'                     # a. or (a).
     ]
     
     # Split text into lines but keep boundaries

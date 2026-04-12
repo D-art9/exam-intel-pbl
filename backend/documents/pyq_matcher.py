@@ -35,11 +35,10 @@ def get_coverage_matrix(syllabus_id: str) -> list: # FIXED: Returns array not di
             chunk_id = str(chunk.id)
             vector = chunk.embedding
             
-            # 2. Search for relevant PYQs using pgvector CosineDistance
-            # FIXED: Using ORM with custom pgvector function
+            # Matches with distance < 0.45 (Similarity > 0.55)
             matches_qs = PYQQuestion.objects.annotate(
                 distance=CosineDistance('embedding', vector)
-            ).filter(distance__lt=0.3).order_by('distance')[:5] 
+            ).filter(distance__lt=0.45).order_by('distance')[:5] 
             
             matches_list = list(matches_qs)
             

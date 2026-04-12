@@ -164,7 +164,7 @@ export function PaperGenerator() {
                </span>
             </div>
 
-            <CoverageMatrix matrix={matrixData} /> // FIXED: matrixData is already an array
+            <CoverageMatrix matrix={matrixData} />
           </div>
         </div>
 

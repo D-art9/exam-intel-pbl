@@ -42,12 +42,7 @@ def parse_markdown_table(table_text):
 
 def process_document(doc_id):
     """
-    Advanced Ingestion Pipeline:
-    1. PDF -> Markdown
-    2. Section Extraction (Regex)
-    3. Structured Chunking (Row-based for tables)
-    4. Fallback Chunking (Text-based)
-    5. Embedding & Saving
+    Stabilized Ingestion Pipeline with AI Fallback for Lecture Plans.
     """
     try:
         doc = Document.objects.get(id=doc_id)
@@ -56,157 +51,109 @@ def process_document(doc_id):
         doc.save()
 
         file_path = os.path.join(settings.MEDIA_ROOT, str(doc.file))
-        print(f"Processing (Structured Mode): {file_path}")
+        print(f"Processing (Resilient Mode): {file_path}")
         
         # 1. Convert to Markdown
         full_text = pymupdf4llm.to_markdown(file_path)
         
-        chunks_to_create = []
+        chunks_to_prepare = []
         from .rag_service import get_embedding_model
         embedding_model = get_embedding_model()
 
-        # --- SECTION 1: LECTURE PLAN (Structured Table) ---
-        # Look for "Lecture Plan" header
+        # --- PHASE 1: Structured Regex Extraction ---
         lec_pattern = r"(?i)^(?:#+\s*)?Lecture\s+Plan[:\s]*(.*?)(?=\n#|\Z)"
         lec_match = re.search(lec_pattern, full_text, re.DOTALL | re.MULTILINE)
         
+        regex_plan_count = 0
         if lec_match:
-            print("Found Lecture Plan Section!")
+            print("Found Lecture Plan Section (Regex).")
             section_text = lec_match.group(1)
-            
-            # Find the table inside
             table_match = re.search(r"(\|.*\|[\r\n]+\|[-:| ]+\|[\r\n]+(?:\|.*\|[\r\n]*)+)", section_text)
             if table_match:
-                table_str = table_match.group(1)
-                rows = parse_markdown_table(table_str)
-                
-                print(f"Parsed {len(rows)} Lecture Rows.")
-                
-                # Create a Summary Chunk
-                summary_text = "Full List of Topics in Lecture Plan: " + ", ".join([r.get('Topics', '') for r in rows])
-                chunks_to_create.append({
-                    "text": summary_text,
-                    "metadata": {"section": "lecture_plan_summary"}
-                })
-
-                # Create Granular Chunks
+                rows = parse_markdown_table(table_match.group(1))
                 for row in rows:
-                    # Construct rich text for retrieval
-                    # "Lecture 5: Image Sampling. Outcome: Apply techniques. CO: CSE3241.1"
-                    lec_no = row.get('Lec.', 'N/A')
-                    topic = row.get('Topics', 'Unknown Topic')
-                    outcome = row.get('Session Outcome', '')
-                    co = row.get('Corresponding CO', '')
-                    
-                    content = f"Lecture {lec_no}: {topic}. \nSession Outcome: {outcome}. \nMapped CO: {co}."
-                    
-                    chunks_to_create.append({
+                    content = f"Lecture {row.get('Lec.', 'N/A')}: {row.get('Topics', 'Unknown Topic')}. \nOutcome: {row.get('Session Outcome', '')}."
+                    chunks_to_prepare.append({
                         "text": content,
                         "metadata": {
                             "section": "lecture_plan",
-                            "lecture_number": lec_no,
-                            "topic": topic,
-                            "co_mapped": co
+                            "lecture_number": row.get('Lec.', 'N/A'),
+                            "topic": row.get('Topics', 'Unknown Topic'),
+                            "co_mapped": row.get('Session Outcome', '')
                         }
                     })
+                    regex_plan_count += 1
 
-        # --- SECTION 2: COURSE OUTCOMES (Structured Table) ---
-        co_pattern = r"(?i)^(?:#+\s*)?Course\s+Outcomes.*?(.*?)(?=\n#|\Z)"
-        co_match = re.search(co_pattern, full_text, re.DOTALL | re.MULTILINE)
-
-        if co_match:
-            print("Found Course Outcomes Section!")
-            section_text = co_match.group(1)
-            table_match = re.search(r"(\|.*\|[\r\n]+\|[-:| ]+\|[\r\n]+(?:\|.*\|[\r\n]*)+)", section_text)
-            
-            if table_match:
-                rows = parse_markdown_table(table_match.group(1))
-                print(f"Parsed {len(rows)} CO Rows.")
-                
-                for row in rows:
-                    co_id = row.get('CO', '')
-                    statement = row.get('CO Statement', '')
-                    bloom = row.get("Bloom's Level", '')
-                    
-                    content = f"Course Outcome {co_id}: {statement}. \nBloom's Level: {bloom}."
-                    
-                    chunks_to_create.append({
-                        "text": content,
-                        "metadata": {
-                            "section": "course_outcomes",
-                            "co_id": co_id,
-                            "bloom_level": bloom
-                        }
-                    })
-
-        # --- SECTION 3: FALLBACK (Everything Else) ---
-        # If we didn't find specific sections, or for the rest of the text
-        # Simple recursion on the whole text (skipping what we already parsed is hard, so we just chunk fully as backup)
-        # Ideally, we remove the parsed tables from full_text, but for now, duplication is safer than missing data.
-        
+        # --- PHASE 2: General Text Splitter (Backup context) ---
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
         raw_chunks = text_splitter.split_text(full_text)
-        
         for i, txt in enumerate(raw_chunks):
-            chunks_to_create.append({
+            chunks_to_prepare.append({
                 "text": txt,
                 "metadata": {"section": "general_text", "chunk_id": i}
             })
 
-        if not chunks_to_create:
-            print("!!! CRITICAL: No text could be extracted.")
+        # --- PHASE 3: Embedding & Initial Save ---
+        if not chunks_to_prepare:
             doc.status = 'failed'
             doc.save()
             return False
 
-        print(f"Total Chunks prepared: {len(chunks_to_create)}")
+        print(f"Preparing embeddings for {len(chunks_to_prepare)} initial chunks...")
+        texts = [c['text'] for c in chunks_to_prepare]
+        all_embeddings = embedding_model.embed_documents(texts)
         
-        # 4. Generate Embeddings & Save (Batch processing for memory safety)
-        print("Generating embeddings in batches...")
-        texts = [c['text'] for c in chunks_to_create]
-        
-        batch_size = 32
-        all_embeddings = []
-        for i in range(0, len(texts), batch_size):
-            batch = texts[i:i + batch_size]
-            batch_embeddings = embedding_model.embed_documents(batch)
-            all_embeddings.extend(batch_embeddings)
-            print(f"   -> Embedded batch {(i//batch_size) + 1}")
-
-        db_chunks = []
-        for idx, item in enumerate(chunks_to_create):
-            db_chunks.append(DocumentChunk(
+        db_chunks = [
+            DocumentChunk(
                 document=doc,
-                chunk_index=idx,
-                text_content=item['text'],
-                metadata=item['metadata'],
-                embedding=all_embeddings[idx]
-            ))
-            
-        # Clear any existing partial data before saving new
+                chunk_index=i,
+                text_content=c['text'],
+                metadata=c['metadata'],
+                embedding=all_embeddings[i]
+            ) for i, c in enumerate(chunks_to_prepare)
+        ]
         doc.chunks.all().delete()
         DocumentChunk.objects.bulk_create(db_chunks)
 
-        # 5. Generate Lecture Plan (Groq)
-        try:
-            print("Triggering AI Lecture Plan Generation...")
-            from .rag_service import generate_lecture_plan
-            plan = generate_lecture_plan(doc.id)
-            if plan:
-                doc.generated_lecture_plan = plan
-                print("   -> Success: Lecture Plan saved.")
-        except Exception as e:
-            print(f"Warning: Failed to generate lecture plan: {e}")
+        # --- PHASE 4: AI Extraction Fallback ---
+        # If regex missed the lecture plan, we run the LLM extraction and ADD those items as chunks
+        print("Triggering AI Lecture Plan Generation (Internal Fallback Check)...")
+        from .rag_service import generate_lecture_plan
+        plan = generate_lecture_plan(doc.id)
+        
+        if plan and regex_plan_count == 0:
+            print(f"Regex failed. Creating {len(plan)} fallback chunks from AI Plan.")
+            fallback_chunks = []
+            for item in plan:
+                content = f"Lecture {item.get('lecture_number')}: {item.get('topic')}. {item.get('description', '')}. \nOutcome: {item.get('co_mapped', '')}"
+                embedding = embedding_model.embed_query(content)
+                
+                # Get current count to set proper index
+                curr_index = DocumentChunk.objects.filter(document=doc).count()
+                
+                fallback_chunks.append(DocumentChunk(
+                    document=doc,
+                    chunk_index=curr_index + len(fallback_chunks),
+                    text_content=content,
+                    metadata={
+                        "section": "lecture_plan",
+                        "lecture_number": item.get('lecture_number'),
+                        "topic": item.get('topic'),
+                        "co_mapped": item.get('co_mapped')
+                    },
+                    embedding=embedding
+                ))
+            DocumentChunk.objects.bulk_create(fallback_chunks)
+            print(f"Successfully integrated {len(fallback_chunks)} AI-extracted outcomes.")
 
         doc.status = 'completed'
         doc.save()
         return True
 
     except Exception as e:
-        print(f"Error processing document {doc_id}: {e}")
+        print(f"Processing Error: {e}")
         import traceback
         traceback.print_exc()
-        # Ensure doc exists before saving
         if 'doc' in locals():
             doc.status = 'failed'
             doc.save()

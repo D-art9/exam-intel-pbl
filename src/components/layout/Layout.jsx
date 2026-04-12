@@ -4,14 +4,17 @@ import { Outlet, useLocation } from 'react-router-dom';
 export function Layout() {
     const location = useLocation();
 
+    // Determine if we should go full-screen for the generator mission
+    const isGenerator = location.pathname.startsWith('/paper-generator');
+
     return (
         <div className="flex min-h-screen bg-neo-black text-white font-sans overflow-hidden">
-            {/* Sidebar (Fixed Navigation) */}
-            <StaggerSidebar />
+            {/* Sidebar (Fixed Navigation) - Hidden in focused generator mode */}
+            {!isGenerator && <StaggerSidebar />}
 
-            {/* Main Content Area */}
-            <main className="flex-1 ml-20 md:ml-64 relative z-0 h-screen overflow-y-auto scrollbar-hide">
-                <div key={location.pathname} className="animate-blur-in p-6 md:p-12 max-w-7xl mx-auto">
+            {/* Main Content Area - Expands to full screen if in generator */}
+            <main className={`flex-1 relative z-0 h-screen overflow-y-auto scrollbar-hide transition-all duration-500 ${!isGenerator ? 'ml-20 md:ml-64' : 'ml-0'}`}>
+                <div key={location.pathname} className={`animate-blur-in ${isGenerator ? 'w-full h-full' : 'p-6 md:p-12 max-w-7xl mx-auto'}`}>
                     <Outlet />
                 </div>
             </main>

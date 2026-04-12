@@ -43,52 +43,42 @@ def parse_marks(text):
 def extract_questions(markdown_text):
     """
     Extracts questions from the markdown using boundary regex.
-    Handles hierarchy (parent question + subparts).
     """
-    # Patterns for question boundaries: Q1., 1), Question 1, [1]
-    boundaries = [
-        r'^\s*(?:Q|Question|Q.)\s*\d+[\.\:]?.*',   # Q1., Question 1:, Q.1
-        r'^\s*\d+[\)\.].*',                        # 1) or 1.
-        r'^\s*\[\d+\]\s*.*',                       # [1]
-        r'^\s*\(?[a-z]\)?\..*'                     # a. or (a).
+    # Patterns for question boundaries: Q1., 1), Question 1:, [1], Q.1
+    patterns = [
+        r'^\s*(?:Q|Question|Q\.)\s*\d+[\.\:]?\s*.*',
+        r'^\s*\d+[\)\.]\s*.*',
+        r'^\s*\[\d+\]\s*.*'
     ]
+    boundary_regex = re.compile('|'.join(patterns), re.IGNORECASE)
     
-    # Split text into lines but keep boundaries
     lines = markdown_text.split('\n')
     questions = []
     current_q_text = []
-    current_q_num = None
     
     for line in lines:
         stripped = line.strip()
-        if not stripped:
-            continue
-            
-        is_parent = re.match(r'^(?:Q\d+\.|\d+\))', stripped)
+        if not stripped: continue
         
-        if is_parent:
-            # Save previous question if exists
+        # If line matches a boundary, it's a new question
+        if boundary_regex.match(line):
             if current_q_text:
-                questions.append({
-                    'num': current_q_num,
-                    'text': '\n'.join(current_q_text)
-                })
-            # Start new question
-            match = re.match(r'^(Q\d+|\d+)', stripped)
-            current_q_num = match.group(1) if match else "Unknown"
+                questions.append('\n'.join(current_q_text))
             current_q_text = [line]
-        elif current_q_text:
-            # Generic text or subpart, if we have a current question, attach it
-            current_q_text.append(line)
+        else:
+            if current_q_text:
+                current_q_text.append(line)
     
     # Add final question
     if current_q_text:
-        questions.append({
-            'num': current_q_num,
-            'text': '\n'.join(current_q_text)
-        })
+        questions.append('\n'.join(current_q_text))
         
-    return questions
+    # Return as structured list, filtering out very short/junk fragments
+    return [
+        {'num': str(i+1), 'text': q.strip()} 
+        for i, q in enumerate(questions) 
+        if len(q.strip()) > 30
+    ]
 
 def ingest_pyq(file_path):
     """

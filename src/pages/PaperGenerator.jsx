@@ -1,7 +1,7 @@
 import { useLocation, useParams, useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react'; # FIXED: Added missing useState
+import { useEffect, useState } from 'react'; // FIXED: Added missing useState
 import { motion, AnimatePresence } from 'framer-motion';
-import { FileText, Cpu, AlertCircle, Loader2, Sparkles, Download, Target } from 'lucide-react'; # FIXED: Added Target from lucide
+import { FileText, Cpu, AlertCircle, Loader2, Sparkles, Download, Target } from 'lucide-react'; // FIXED: Added Target from lucide
 import { NeoCard, NeoButton } from '../components/neo/NeoComponents';
 import { usePaperGenerator } from '../hooks/usePaperGenerator';
 import PaperConfigForm from '../components/paper/PaperConfigForm';

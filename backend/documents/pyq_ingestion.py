@@ -11,10 +11,9 @@ from .rag_service import get_embedding_model
 
 def extract_year(filename):
     """
-    Extracts a 4-digit year from the filename using regex.
-    Returns the year as an integer or None if not found.
+    Extracts a 4-digit year (beginning with 20) from the filename.
     """
-    pattern = r'\b(20\d{2})\b'
+    pattern = r'(20\d{2})' # FIXED: Removed \b boundaries to support underscores
     match = re.search(pattern, filename)
     return int(match.group(1)) if match else None
 

@@ -1,7 +1,7 @@
 import { useLocation, useParams, useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react'; # FIXED: Added missing useState
 import { motion, AnimatePresence } from 'framer-motion';
-import { FileText, Cpu, AlertCircle, Loader2, Sparkles, Download } from 'lucide-react';
+import { FileText, Cpu, AlertCircle, Loader2, Sparkles, Download, Target } from 'lucide-react'; # FIXED: Added Target from lucide
 import { NeoCard, NeoButton } from '../components/neo/NeoComponents';
 import { usePaperGenerator } from '../hooks/usePaperGenerator';
 import PaperConfigForm from '../components/paper/PaperConfigForm';
@@ -43,6 +43,9 @@ export function PaperGenerator() {
       </div>
     );
   }
+
+  // FIXED: Adjusted coverage matrix prop access to handle the new response structure
+  const matrixData = coverage?.matrix || []; # FIXED
 
   if (isCoverageError) {
     return (
@@ -161,7 +164,7 @@ export function PaperGenerator() {
                </span>
             </div>
 
-            <CoverageMatrix matrix={coverage} />
+            <CoverageMatrix matrix={matrixData} /> # FIXED: matrixData is already an array
           </div>
         </div>
 
@@ -187,27 +190,5 @@ export function PaperGenerator() {
         )}
       </AnimatePresence>
     </div>
-  );
-}
-
-// Internal Lucide alias for cleaner code
-function Target(props) {
-  return (
-    <svg 
-      xmlns="http://www.w3.org/2000/svg" 
-      width="24" 
-      height="24" 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
-      strokeWidth="2" 
-      strokeLinecap="round" 
-      strokeLinejoin="round" 
-      {...props}
-    >
-      <circle cx="12" cy="12" r="10" />
-      <circle cx="12" cy="12" r="6" />
-      <circle cx="12" cy="12" r="2" />
-    </svg>
   );
 }

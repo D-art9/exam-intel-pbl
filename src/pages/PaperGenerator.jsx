@@ -45,7 +45,7 @@ export function PaperGenerator() {
   }
 
   // FIXED: Adjusted coverage matrix prop access to handle the new response structure
-  const matrixData = coverage?.matrix || []; # FIXED
+  const matrixData = coverage?.matrix || []; // FIXED
 
   if (isCoverageError) {
     return (
@@ -164,7 +164,7 @@ export function PaperGenerator() {
                </span>
             </div>
 
-            <CoverageMatrix matrix={matrixData} /> # FIXED: matrixData is already an array
+            <CoverageMatrix matrix={matrixData} /> // FIXED: matrixData is already an array
           </div>
         </div>
 

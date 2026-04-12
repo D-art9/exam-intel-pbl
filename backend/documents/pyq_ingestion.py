@@ -61,7 +61,7 @@ def extract_questions(markdown_text):
         if not stripped: continue
         
         # If line matches a boundary, it's a new question
-        if boundary_regex.match(line):
+        if boundary_regex.match(stripped):
             if current_q_text:
                 questions.append('\n'.join(current_q_text))
             current_q_text = [line]

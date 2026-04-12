@@ -1,7 +1,7 @@
 import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react'; // FIXED: Added missing useState
 import { motion, AnimatePresence } from 'framer-motion';
-import { FileText, Cpu, AlertCircle, Loader2, Sparkles, Download, Target } from 'lucide-react'; // FIXED: Added Target from lucide
+import { FileText, Cpu, AlertCircle, Loader2, Sparkles, Download, Target, Home } from 'lucide-react'; 
 import { NeoCard, NeoButton } from '../components/neo/NeoComponents';
 import { usePaperGenerator } from '../hooks/usePaperGenerator';
 import PaperConfigForm from '../components/paper/PaperConfigForm';
@@ -81,6 +81,15 @@ export function PaperGenerator() {
         </div>
 
         <div className="flex items-center gap-4">
+          <NeoButton 
+            variant="secondary" 
+            onClick={() => navigate('/')}
+            className="px-4 py-2 border-neutral-800 hover:border-neo-orange flex items-center gap-2 group transition-all"
+          >
+            <Home className="w-4 h-4 group-hover:text-neo-orange transition-colors" />
+            <span className="text-[10px] font-mono uppercase tracking-widest">Return Home</span>
+          </NeoButton>
+
           <div className="hidden md:flex items-center gap-2 px-3 py-1 bg-black border border-neutral-800 rounded-full">
             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             <span className="text-[10px] font-mono text-emerald-500 uppercase tracking-widest">Pipeline Active</span>

@@ -12,6 +12,7 @@ export function PaperGenerator() {
   const navigate = useNavigate();
   const location = useLocation();
   const [activeTab, setActiveTab] = useState('coverage');
+  const [isGeneratingModal, setIsGeneratingModal] = useState(false);
 
   // Mode Guard: Only accessible in Smart Paper Mode
   useEffect(() => {
@@ -97,86 +98,102 @@ export function PaperGenerator() {
         </div>
       </div>
 
-      {/* Split Content Layout */}
-      <div className="flex-1 flex overflow-hidden">
+      {/* Single Column Content Layout */}
+      <div className="flex-1 flex flex-col overflow-y-auto custom-scrollbar bg-neo-black relative">
         
-        {/* Left Panel: Configuration (40%) */}
-        <div className="w-full md:w-[40%] border-r border-neutral-800 bg-neo-surface overflow-y-auto custom-scrollbar relative">
-          <div className="p-8">
-             <div className="mb-8 flex items-center gap-3">
-               <Cpu className="w-5 h-5 text-neo-orange" />
-               <h2 className="text-lg font-bold text-white uppercase tracking-widest border-b-2 border-neo-orange pb-1">
-                 Payload Config
-               </h2>
+        {/* Coverage Matrix - Full Width */}
+        <div className="w-full max-w-6xl mx-auto p-8 pb-32">
+          <div className="mb-12 flex flex-col md:flex-row md:items-center justify-between gap-6 bg-neo-surface p-6 border border-neutral-800 border-l-4 border-l-neo-orange">
+             <div className="flex items-center gap-3">
+               <Target className="w-6 h-6 text-neo-orange" />
+               <div>
+                  <h2 className="text-xl font-black text-white uppercase tracking-tighter italic">
+                    Coverage <span className="text-neo-orange">Intelligence</span>
+                  </h2>
+                  <p className="text-[10px] font-mono text-neutral-500 uppercase tracking-widest mt-1">
+                    Mapping Exam Source: {documentId?.split('-')[0]}
+                  </p>
+               </div>
              </div>
              
-             <PaperConfigForm 
-               onSubmit={handleGenerate} 
-               isGenerating={isGenerating} 
-             />
+             <div className="flex items-center gap-4">
+                <div className="text-right hidden sm:block">
+                   <p className="text-[9px] font-mono text-neutral-500 uppercase">Analysis Confidence</p>
+                   <p className="text-sm font-black text-emerald-500">94.2% SYNCHRONIZED</p>
+                </div>
+                <NeoButton 
+                  onClick={() => setIsGeneratingModal(true)}
+                  className="px-8 py-3 bg-neo-orange text-black font-black uppercase tracking-widest text-xs flex items-center gap-2 shadow-[0_10px_30px_rgba(255,85,0,0.3)] hover:translate-y-[-2px] transition-all"
+                >
+                  <Sparkles size={16} />
+                  Compile Smart Paper
+                </NeoButton>
+             </div>
           </div>
 
-          {/* Loading Overlay for Generation */}
-          <AnimatePresence>
-            {isGenerating && (
-              <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="absolute inset-0 z-50 bg-black/80 backdrop-blur-md flex flex-col items-center justify-center p-12 text-center"
-              >
-                <div className="relative">
-                  <motion.div 
-                    animate={{ scale: [1, 1.2, 1], rotate: [0, 90, 0] }}
-                    transition={{ duration: 3, repeat: Infinity }}
-                    className="w-24 h-24 border-4 border-neo-orange/20 rounded-none absolute -inset-2"
-                  />
-                  <div className="relative bg-neo-orange p-6 shadow-[0_0_30px_rgba(255,85,0,0.4)]">
-                    <Sparkles className="w-12 h-12 text-black animate-pulse" />
-                  </div>
-                </div>
-                
-                <div className="mt-12 space-y-4">
-                  <h3 className="text-3xl font-black text-white uppercase tracking-tighter italic">
-                    Synthesizing <span className="text-neo-orange">Paper</span>
-                  </h3>
-                  <div className="flex flex-col gap-2 items-center">
-                    <p className="text-neutral-500 font-mono text-xs uppercase tracking-[0.2em] animate-pulse">
-                      Greedy Selection Protocol in Progress...
-                    </p>
-                    <div className="w-48 h-1 bg-neutral-900 overflow-hidden">
-                      <motion.div 
-                        animate={{ x: [-200, 200] }}
-                        transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-                        className="w-24 h-full bg-neo-orange"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          <CoverageMatrix matrix={matrixData} />
         </div>
 
-        {/* Right Panel: Coverage Matrix (60%) */}
-        <div className="hidden md:block md:w-[60%] bg-neo-black overflow-y-auto custom-scrollbar">
-          <div className="p-8">
-            <div className="mb-8 flex items-center justify-between">
-               <div className="flex items-center gap-3">
-                 <Target className="w-5 h-5 text-neo-orange" />
-                 <h2 className="text-lg font-bold text-white uppercase tracking-widest border-b-2 border-neo-orange pb-1">
-                   Coverage Matrix
-                 </h2>
-               </div>
-               <span className="text-[10px] font-mono text-neutral-500 uppercase tracking-widest bg-neutral-900 px-3 py-1 border border-neutral-800">
-                 Source: {documentId?.split('-')[0]}
-               </span>
-            </div>
+        {/* Floating Paper Config Modal (Replacing the sidebar) */}
+        <AnimatePresence>
+          {isGeneratingModal && (
+            <motion.div 
+               initial={{ opacity: 0 }}
+               animate={{ opacity: 1 }}
+               exit={{ opacity: 0 }}
+               className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md flex items-center justify-center p-6"
+            >
+               <motion.div 
+                 initial={{ scale: 0.9, y: 20 }}
+                 animate={{ scale: 1, y: 0 }}
+                 exit={{ scale: 0.9, y: 20 }}
+                 className="w-full max-w-2xl bg-neo-black border-2 border-neo-orange shadow-[20px_20px_0px_0px_rgba(255,85,0,0.2)]"
+               >
+                  <div className="p-6 border-b border-neutral-800 flex justify-between items-center bg-neo-surface">
+                     <h2 className="text-xl font-black text-white uppercase italic flex items-center gap-3">
+                        <Cpu className="text-neo-orange" /> Synthesis Config
+                     </h2>
+                     <button onClick={() => setIsGeneratingModal(false)} className="text-neutral-500 hover:text-white">
+                        <Home size={20} />
+                     </button>
+                  </div>
+                  <div className="p-8 max-h-[70vh] overflow-y-auto custom-scrollbar">
+                    <PaperConfigForm 
+                      onSubmit={(config) => {
+                        setIsGeneratingModal(false);
+                        handleGenerate(config);
+                      }} 
+                      isGenerating={isGenerating} 
+                    />
+                  </div>
+               </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-            <CoverageMatrix matrix={matrixData} />
-          </div>
-        </div>
-
+        {/* Global Loading Overlay for Generation - Moved out of the panel */}
+        <AnimatePresence>
+          {isGenerating && (
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[200] bg-black/90 backdrop-blur-xl flex flex-col items-center justify-center p-12 text-center"
+            >
+               <motion.div 
+                  animate={{ scale: [1, 1.2, 1], rotate: 360 }}
+                  transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                  className="w-32 h-32 border-4 border-neo-orange/20 border-t-neo-orange rounded-full mb-12 shadow-[0_0_50px_rgba(255,85,0,0.2)]"
+               />
+               <h3 className="text-4xl font-black text-white uppercase tracking-tighter italic mb-4">
+                  Neural <span className="text-neo-orange">Synthesis</span>
+               </h3>
+               <p className="text-neutral-500 font-mono text-xs uppercase tracking-[0.4em] animate-pulse">
+                  Selecting Optimized Question Nodes...
+               </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Feedback Notifications */}

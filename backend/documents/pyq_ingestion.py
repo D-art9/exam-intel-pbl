@@ -80,6 +80,62 @@ def extract_questions(markdown_text):
         if len(q.strip()) > 30
     ]
 
+from langchain_groq import ChatGroq
+from langchain_core.prompts import ChatPromptTemplate
+import json
+
+def extract_questions_with_llm(markdown_text):
+    """
+    Uses Llama-3 (via Groq) to intelligently extract individual questions from raw Markdown.
+    This replaces/augments the fragile regex-based extraction.
+    """
+    print("Step 2: Calling Groq (Llama 3) for structural question extraction...")
+    try:
+        llm = ChatGroq(
+            temperature=0, 
+            model_name="llama-3.3-70b-versatile", 
+            api_key=settings.GROQ_API_KEY
+        )
+
+        system_prompt = """
+        You are a Specialized Academic Document Parser. Your goal is to extract individual questions from an exam paper.
+        Return ONLY a raw JSON list of objects with these keys:
+        - "num" (string, the question number like '1', 'Q1', '2a', etc.)
+        - "text" (string, the full text of the question including any mark values)
+        - "marks" (number or null, the marks assigned to the question if explicitly stated)
+
+        Instructions:
+        1. Identify every unique question block.
+        2. Preserve the original wording of the questions.
+        3. If a question has sub-parts (like 1a, 1b), treat them as separate list items or group them if they belong together logically.
+        4. Do NOT include markdown formatting (like ```json). Just the raw JSON string.
+        5. If no clear questions are found, return [].
+        """
+
+        # Truncate text if too long (Groq context limits), usually exam papers aren't that huge
+        # 16k chars is usually safe for most 4-8 page papers.
+        payload = markdown_text[:18000]
+
+        messages = [
+            ("system", system_prompt),
+            ("human", f"Exam Paper Content (Markdown):\n{payload}")
+        ]
+
+        response = llm.invoke(messages)
+        content = response.content.strip()
+        
+        # Clean markdown if present
+        if content.startswith("```json"):
+            content = content.replace("```json", "").replace("```", "")
+        
+        extracted_json = json.loads(content)
+        print(f"   -> LLM successfully extracted {len(extracted_json)} questions.")
+        return extracted_json
+
+    except Exception as e:
+        print(f"!!! LLM EXTRACTION ERROR !!!: {str(e)}")
+        return None
+
 def ingest_pyq(file_path):
     """
     Main ingestion pipeline for PYQ PDFs.
@@ -101,19 +157,26 @@ def ingest_pyq(file_path):
         print(f"Error converting PDF to Markdown: {e}")
         return
 
-    # 2. Extract Questions
+    # 2. Extract Questions (LLM First, Regex as backup)
     print(f"--- [EXTRACT DEBUG] Markdown Snippet: {markdown_text[:150].replace('\n', ' ')}...")
-    extracted = extract_questions(markdown_text)
     
-    # NEW FALLBACK: If regex fails, don't return 0. Use the full text as one giant context chunk.
+    # Try LLM Extraction first
+    extracted = extract_questions_with_llm(markdown_text)
+    
+    # Fallback to Regex if LLM fails or returns empty
     if not extracted:
-        print("!!! WARNING: Regex extraction found 0 questions. Using full paper body as fallback.")
+        print("Falling back to Regex Extraction...")
+        extracted = extract_questions(markdown_text)
+    
+    # FINAL FALLBACK: If everything fails, use the full paper body
+    if not extracted:
+        print("!!! WARNING: All extraction methods failed. Using full paper body as fallback.")
         extracted = [{
             'num': 'FULL_PAPER',
             'text': f"Full Paper Content ({filename}):\n" + markdown_text[:8000]
         }]
     
-    print(f"Extracted {len(extracted)} question blocks.")
+    print(f"Extraction yield: {len(extracted)} question blocks.")
 
     # 3. Embed and Save
     embedding_model = get_embedding_model()

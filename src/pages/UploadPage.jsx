@@ -82,8 +82,135 @@ export function UploadPage() {
         }
     };
 
+    const [processingStep, setProcessingStep] = useState(0);
+
+    const steps = [
+        "Initializing Neural Handshake...",
+        "Parsing Mission Payload...",
+        "Identifying Syllabus Patterns...",
+        "Extracting PYQ Question Blocks...",
+        "Generating 384-dim Vectors...",
+        "Indexing Knowledge Base..."
+    ];
+
+    useEffect(() => {
+        let interval;
+        if (isUploading) {
+            interval = setInterval(() => {
+                setProcessingStep(prev => (prev + 1) % steps.length);
+            }, 3000);
+        } else {
+            setProcessingStep(0);
+        }
+        return () => clearInterval(interval);
+    }, [isUploading]);
+
     return (
         <div className="container max-w-5xl mx-auto space-y-12 pb-24 h-full">
+            {/* Mission Processing Overlay */}
+            <AnimatePresence>
+                {isUploading && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[200] bg-neo-black/95 backdrop-blur-xl flex flex-col items-center justify-center p-8 text-center"
+                    >
+                        <div className="relative mb-20">
+                            {/* Outer Rings */}
+                            <motion.div 
+                                animate={{ rotate: 360 }}
+                                transition={{ repeat: Infinity, duration: 20, ease: "linear" }}
+                                className="absolute -inset-16 border border-neo-orange/10 rounded-full"
+                            />
+                            <motion.div 
+                                animate={{ rotate: -360 }}
+                                transition={{ repeat: Infinity, duration: 15, ease: "linear" }}
+                                className="absolute -inset-10 border-2 border-dashed border-neo-orange/20 rounded-full"
+                            />
+                            
+                            {/* Core Icon */}
+                            <div className="relative w-32 h-32 bg-neo-orange/5 border-2 border-neo-orange flex items-center justify-center shadow-[0_0_50px_rgba(255,85,0,0.2)]">
+                                <Cpu className="w-16 h-16 text-neo-orange animate-pulse" />
+                                
+                                {/* Corner Accents */}
+                                <div className="absolute -top-1 -left-1 w-4 h-4 border-t-2 border-l-2 border-neo-orange" />
+                                <div className="absolute -bottom-1 -right-1 w-4 h-4 border-b-2 border-r-2 border-neo-orange" />
+                            </div>
+                        </div>
+
+                        <div className="max-w-md w-full space-y-8">
+                            <div className="space-y-2">
+                                <h2 className="text-3xl md:text-4xl font-black text-white uppercase italic tracking-tighter">
+                                    Synthesizing <span className="text-neo-orange">Payload</span>
+                                </h2>
+                                <div className="flex items-center justify-center gap-2">
+                                    <div className="h-1 w-12 bg-neo-orange animate-pulse" />
+                                    <span className="text-neo-orange font-mono text-[10px] uppercase tracking-[0.3em]">
+                                        Pipeline Level 4 Active
+                                    </span>
+                                    <div className="h-1 w-12 bg-neo-orange animate-pulse" />
+                                </div>
+                            </div>
+
+                            <div className="space-y-4">
+                                <AnimatePresence mode="wait">
+                                    <motion.p
+                                        key={processingStep}
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -10 }}
+                                        className="text-neutral-400 font-mono text-xs uppercase tracking-widest min-h-[1.5rem]"
+                                    >
+                                        {steps[processingStep]}
+                                    </motion.p>
+                                </AnimatePresence>
+
+                                <div className="relative h-1.5 w-full bg-neutral-900 border border-neutral-800 overflow-hidden">
+                                    <motion.div 
+                                        className="absolute inset-y-0 left-0 bg-neo-orange"
+                                        initial={{ width: "0%" }}
+                                        animate={{ width: "100%" }}
+                                        transition={{ 
+                                            duration: 15, // Slow progress simulation
+                                            ease: "linear",
+                                            repeat: Infinity 
+                                        }}
+                                    />
+                                    {/* Scan Line */}
+                                    <motion.div 
+                                        className="absolute inset-y-0 w-20 bg-white/20 blur-md"
+                                        animate={{ x: ["-100%", "500%"] }}
+                                        transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4 pt-4">
+                                <div className="p-3 border border-neutral-900 bg-neutral-900/50 text-left">
+                                    <p className="text-[8px] text-neutral-600 uppercase font-bold mb-1">Vector Scale</p>
+                                    <p className="text-xs font-mono text-neo-orange">384 Dimensions</p>
+                                </div>
+                                <div className="p-3 border border-neutral-900 bg-neutral-900/50 text-left">
+                                    <p className="text-[8px] text-neutral-600 uppercase font-bold mb-1">Compute Core</p>
+                                    <p className="text-xs font-mono text-neo-orange">LPU Optimized</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Floating Tech Text */}
+                        <div className="absolute top-10 left-10 pointer-events-none hidden lg:block opacity-30">
+                            <p className="text-[9px] font-mono text-neutral-500 text-left leading-relaxed">
+                                DB_HANDSHAKE: OK<br/>
+                                CLUSTER_INDEX: BUILDING<br/>
+                                FRAG_COUNT: AUTOMATIC<br/>
+                                ANALYTICS_v4: INIT
+                            </p>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
             {/* Header */}
             <div className="space-y-4 pt-12 relative">
                 <div className="absolute -left-12 top-16 hidden lg:block">

@@ -1,5 +1,6 @@
 import { StaggerSidebar } from '../neo/StaggerSidebar';
 import { Outlet, useLocation } from 'react-router-dom';
+import { WorkflowModal } from '../modals/WorkflowModal';
 
 export function Layout() {
     const location = useLocation();
@@ -9,6 +10,7 @@ export function Layout() {
 
     return (
         <div className="flex min-h-screen bg-neo-black text-white font-sans overflow-hidden">
+            <WorkflowModal />
             {/* Sidebar (Fixed Navigation) - Hidden in focused generator mode */}
             {!isGenerator && <StaggerSidebar />}
 

@@ -108,7 +108,6 @@ export default function CoverageMatrix({ matrix }) {
                     </span>
                   </p>
                 </div>
-              </div>
 
               {/* Coverage Analytics & Toggle */}
               <div className="flex items-center gap-8">

@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { Target, AlertTriangle, Star, CheckCircle2, ChevronDown, FileQuestion, Calendar, Award } from 'lucide-react';
+import { Target, AlertTriangle, Star, CheckCircle2, ChevronDown, FileQuestion, Calendar, Award, Youtube as LucideYoutube } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '../../lib/utils';
 
@@ -70,11 +70,20 @@ export default function CoverageMatrix({ matrix }) {
                   <span className="text-xl font-black text-white leading-tight">{row.lecture_number || idx + 1}</span>
                 </div>
                 
-                <div className="space-y-1">
-                  <div className="flex items-center gap-3 flex-wrap">
+                      <div className="flex items-center gap-3 flex-wrap">
                     <h3 className="text-sm md:text-lg font-black text-white tracking-tight uppercase italic group-hover:text-neo-orange transition-colors">
                       {row.topic || 'Untitled Session'}
                     </h3>
+
+                    {/* Difficulty Badge */}
+                    <div className={cn(
+                      "px-2 py-0.5 text-[9px] font-black uppercase tracking-tighter border",
+                      row.difficulty === 'COMPLEX' ? "bg-red-500/10 border-red-500 text-red-500" :
+                      row.difficulty === 'INTERMEDIATE' ? "bg-amber-500/10 border-amber-500 text-amber-500" :
+                      "bg-emerald-500/10 border-emerald-500 text-emerald-500"
+                    )}>
+                      {row.difficulty || 'BASIC'}
+                    </div>
                     
                     {/* Frequency Badge */}
                     {row.is_high_frequency && (
@@ -103,6 +112,20 @@ export default function CoverageMatrix({ matrix }) {
 
               {/* Coverage Analytics & Toggle */}
               <div className="flex items-center gap-8">
+                {/* YouTube Link - Quick Access */}
+                <motion.a
+                  href={row.youtube_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={(e) => e.stopPropagation()}
+                  className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-red-600/10 border border-red-600/30 text-red-500 hover:bg-red-600 hover:text-white transition-all text-[9px] font-black uppercase tracking-widest"
+                >
+                  <LucideYoutube className="w-3 h-3" />
+                  Learn
+                </motion.a>
+
                 <div className="hidden lg:block w-48 space-y-2">
                   <div className="flex items-center justify-between text-[9px] font-mono uppercase tracking-[0.2em] mb-1">
                     <span className="text-neutral-600">Sync Status</span>

@@ -81,9 +81,20 @@ def get_coverage_matrix(syllabus_id: str) -> list: # FIXED: Returns array not di
                     "final_score": float(final_score),
                 })
             
-            # 5. Flag HIGH_FREQ=True if semantically similar questions appear in 3+ distinct years
-            high_freq = len(unique_years) >= 3
+            # 5. Determine Difficulty Heuristic: 
+            # High marks average (>10) = COMPLEX, Moderate (5-10) = INTERMEDIATE, Low (<5) = BASIC
+            total_marks = sum([m.marks for m in matches_list if m.marks])
+            avg_marks = total_marks / len(matches_list) if matches_list else 0
             
+            difficulty = "BASIC"
+            if avg_marks > 12: difficulty = "COMPLEX"
+            elif avg_marks > 6: difficulty = "INTERMEDIATE"
+
+            # 6. Construct Intelligence-driven YouTube Query
+            # We use the topic name + a general academic suffix
+            clean_topic = chunk.metadata.get("topic", "Exam Topic").replace(" ", "+")
+            youtube_url = f"https://www.youtube.com/results?search_query={clean_topic}+explained+university+lecture"
+
             coverage_list.append({ # FIXED: Append to list
                 "id": chunk_id,
                 "lecture_number": chunk.metadata.get("lecture_number"),
@@ -92,7 +103,9 @@ def get_coverage_matrix(syllabus_id: str) -> list: # FIXED: Returns array not di
                 "matches": match_data,
                 "match_count": len(match_data),
                 "blind_spot": False,
-                "is_high_frequency": high_freq,
+                "is_high_frequency": len(unique_years) >= 3,
+                "difficulty": difficulty,
+                "youtube_url": youtube_url,
                 "coverage_strength": "HIGH" if len(match_data) >= 3 else "MED" if len(match_data) > 0 else "LOW"
             })
                 

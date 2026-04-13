@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { NeoCard, NeoButton } from '../components/neo/NeoComponents';
-import { ArrowRight, Box, Cpu, Database, FileText, Layers, Search, Server, Shield, Zap } from 'lucide-react';
+import { ArrowRight, Box, Cpu, Database, FileText, Layers, Search, Server, Shield, Zap, Target } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const WorkflowStep = ({ icon: Icon, title, description, step, color = "text-neo-primary" }) => {

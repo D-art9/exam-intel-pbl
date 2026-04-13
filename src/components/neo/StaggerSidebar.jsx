@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { NavLink, useLocation } from 'react-router-dom';
-import { Home, Upload, Brain, BarChart, Settings, Mail, Info, Cpu, FileText, Target, ShieldCheck } from 'lucide-react';
+import { Home, Upload, Brain, BarChart, Settings, Mail, Info, Cpu, FileText, Target, ShieldCheck, Zap } from 'lucide-react';
 
 const sidebarVariants = {
     open: {

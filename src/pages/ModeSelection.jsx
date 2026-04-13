@@ -9,11 +9,20 @@ import axios from 'axios';
 export default function ModeSelection() {
   const [selectedMode, setSelectedMode] = useState(null);
   const [isDemoLoading, setIsDemoLoading] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const navigate = useNavigate();
 
   const handleContinue = () => {
     if (selectedMode) {
-      navigate('/upload', { state: { mode: selectedMode } });
+      if (selectedMode === 'smart-paper') {
+        setIsTransitioning(true);
+        // Simulate a brief neural handshake
+        setTimeout(() => {
+          navigate('/upload', { state: { mode: selectedMode } });
+        }, 2500);
+      } else {
+        navigate('/upload', { state: { mode: selectedMode } });
+      }
     }
   };
 
@@ -187,6 +196,66 @@ export default function ModeSelection() {
         <div className="w-1 h-1 rounded-full bg-neutral-800" />
         <span>Neural Extraction</span>
       </motion.div>
+
+      {/* Neural Handshake Loading Overlay */}
+      <AnimatePresence>
+        {isTransitioning && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[200] bg-black flex flex-col items-center justify-center p-6 text-center"
+          >
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.5 }}
+              className="relative"
+            >
+              {/* Spinning Hexagon / Pulse */}
+              <div className="w-32 h-32 border-4 border-neo-orange absolute inset-0 animate-ping opacity-20" />
+              <div className="w-32 h-32 border-2 border-neo-orange/50 relative flex items-center justify-center bg-neo-orange/5">
+                <Zap className="w-12 h-12 text-neo-orange animate-pulse" />
+              </div>
+            </motion.div>
+
+            <div className="mt-12 space-y-4 max-w-sm">
+              <h2 className="text-2xl font-black text-white uppercase italic tracking-tighter">
+                Initializing <span className="text-neo-orange">Smart Paper</span> Mode
+              </h2>
+              
+              <div className="h-1.5 w-full bg-neutral-900 overflow-hidden relative border border-neutral-800">
+                <motion.div 
+                  initial={{ x: '-100%' }}
+                  animate={{ x: '0%' }}
+                  transition={{ duration: 2, ease: "easeInOut" }}
+                  className="absolute inset-0 bg-neo-orange shadow-[0_0_15px_rgba(255,85,0,0.6)]"
+                />
+              </div>
+
+              <div className="flex justify-between font-mono text-[9px] text-neutral-500 uppercase tracking-widest pt-2">
+                <motion.span
+                  animate={{ opacity: [1, 0, 1] }}
+                  transition={{ repeat: Infinity, duration: 0.5 }}
+                >
+                  Neural_Handshake_Active
+                </motion.span>
+                <span>70B_Llama_Ready</span>
+              </div>
+            </div>
+
+            {/* Subtle background text */}
+            <div className="absolute bottom-10 left-10 pointer-events-none opacity-20">
+               <p className="text-[8px] font-mono text-neutral-600 leading-tight">
+                  CORE_SYSTEM_OS: v4.0.1<br/>
+                  PIPELINE_STATUS: 100%_OPERATIONAL<br/>
+                  VECTOR_DIM: 384_DENSE<br/>
+                  LLM_PROVIDER: GROQ_LPU
+               </p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

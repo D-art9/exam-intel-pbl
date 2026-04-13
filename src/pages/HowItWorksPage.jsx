@@ -86,8 +86,8 @@ export function HowItWorksPage() {
                                 <WorkflowStep
                                     step="01"
                                     icon={FileText}
-                                    title="PDF Standardization"
-                                    description="Raw PDF binary is processed using PyMuPDF4LLM. Complex layouts, tables, and headers are standardized into GitHub-Flavored Markdown to preserve semantic structure."
+                                    title="Neural Ingestion & Extraction"
+                                    description="Documents are standardized into Markdown, but here is the secret sauce: We use Llama-3-70B as a 'Structural Parser' to intelligently extract questions, identifying numbers, text, and marks regardless of PDF formatting."
                                     color="text-blue-400"
                                 />
                                 <WorkflowStep
@@ -100,16 +100,16 @@ export function HowItWorksPage() {
                                 <WorkflowStep
                                     step="03"
                                     icon={Box}
-                                    title="Vector Embedding"
-                                    description="Each text chunk is passed through the 'all-MiniLM-L6-v2' model, converting it into a 384-dimensional vector representation of its meaning."
+                                    title="Vector Encoding"
+                                    description="Each chunk is passed through the 'all-MiniLM-L6-v2' model, converting it into a 384-dimensional vector representation of its semantic meaning."
                                     color="text-green-400"
                                 />
                                 <WorkflowStep
                                     step="04"
-                                    icon={Server}
-                                    title="Vector Storage"
-                                    description="Embeddings and metadata are stored in PostgreSQL equipped with the pgvector extension for high-performance similarity search."
-                                    color="text-orange-400"
+                                    icon={Target}
+                                    title="Coverage Mapping"
+                                    description="Our 'Matcher' performs a massive Cosine Similarity search to link syllabus topics with the extracted questions, identifying Blind Spots and calculating Difficulty High-Frequency tags."
+                                    color="text-neo-orange"
                                 />
                             </div>
                         </NeoCard>
@@ -159,6 +159,19 @@ export function HowItWorksPage() {
                                     The fused prompt is sent to the **Groq LPU** running **Llama-3-70b**. The LPU (Language Processing Unit) architecture allows for blazing-fast token generation, delivering complex answers in &lt;2 seconds.
                                 </p>
                             </NeoCard>
+
+                            <NeoCard className="p-6 relative overflow-hidden group border-neo-orange/20 bg-neo-orange/[0.02]">
+                                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                                     <Target size={120} className="text-neo-orange" />
+                                 </div>
+                                 <h3 className="text-xl font-bold mb-3 text-neo-orange">4. Intelligence Analytics</h3>
+                                 <p className="text-neutral-400">
+                                     Finally, our **Intelligence Engine** calculates meta-data for your revision:
+                                     <br />• **Frequency**: Highlights topics appearing in 3+ years.
+                                     <br />• **Difficulty**: Grades topics (Basic to Complex) based on the marks they historically carry.
+                                     <br />• **YouTube Curations**: Generates on-the-fly search strings for deep learning.
+                                 </p>
+                             </NeoCard>
                         </div>
                     </section>
 

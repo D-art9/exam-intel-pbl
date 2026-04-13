@@ -148,17 +148,20 @@ def ingest_pyq(file_path):
     year = extract_year(filename)
     exam_type = detect_exam_type(filename)
     
-    print(f"Ingesting: {filename} (Year: {year}, Type: {exam_type})")
+    print(f"--- [MISSION START] Ingesting: {filename} ---")
+    print(f"   -> Detected Year: {year or 'UNKNOWN'}")
+    print(f"   -> Detected Type: {exam_type or 'GENERAL'}")
     
     # 1. Convert to Markdown
     try:
         markdown_text = pymupdf4llm.to_markdown(file_path)
+        print(f"   -> [PDF INFO] Standardization complete ({len(markdown_text)} characters converted).")
     except Exception as e:
-        print(f"Error converting PDF to Markdown: {e}")
+        print(f"!!! [CONVERSION ERROR] PDF to Markdown failed: {e}")
         return
-
+    
     # 2. Extract Questions (LLM First, Regex as backup)
-    print(f"--- [EXTRACT DEBUG] Markdown Snippet: {markdown_text[:150].replace('\n', ' ')}...")
+    print(f"   -> [DEBUG] Header Fragment: {markdown_text[:100].strip()}...")
     
     # Try LLM Extraction first
     extracted = extract_questions_with_llm(markdown_text)

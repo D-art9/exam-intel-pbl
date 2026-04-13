@@ -17,6 +17,7 @@ def get_coverage_matrix(syllabus_id: str) -> list: # FIXED: Returns array not di
         A list of coverage objects for the syllabus.
     """
     try:
+        logger.info(f"--- [COVERAGE START] Computing Intelligence Matrix for Syllabus: {syllabus_id} ---")
         # 1. Fetch lecture plan chunks from the syllabus
         lecture_chunks = DocumentChunk.objects.filter(
             document_id=syllabus_id, 
@@ -34,8 +35,13 @@ def get_coverage_matrix(syllabus_id: str) -> list: # FIXED: Returns array not di
         for chunk in lecture_chunks:
             chunk_id = str(chunk.id)
             vector = chunk.embedding
+            topic_name = chunk.metadata.get("topic", "Exam Topic")
             
-            # Matches with distance < 0.45 (Similarity > 0.55)
+            # Construct Intelligence-driven YouTube Query (Global for all topics)
+            clean_topic = topic_name.replace(" ", "+")
+            youtube_url = f"https://www.youtube.com/results?search_query={clean_topic}+explained+university+lecture"
+
+            # Matches with distance < 0.5 (Similarity > 0.5)
             matches_qs = PYQQuestion.objects.annotate(
                 distance=CosineDistance('embedding', vector)
             ).filter(distance__lt=0.5).order_by('distance')[:5] 
@@ -43,15 +49,18 @@ def get_coverage_matrix(syllabus_id: str) -> list: # FIXED: Returns array not di
             matches_list = list(matches_qs)
             
             if not matches_list:
+                logger.info(f"   -> [BLIND SPOT] Topic: {topic_name}")
                 coverage_list.append({
                     "id": chunk_id,
                     "lecture_number": chunk.metadata.get("lecture_number"),
-                    "topic": chunk.metadata.get("topic"),
+                    "topic": topic_name,
                     "co_mapped": chunk.metadata.get("co_mapped"),
                     "matches": [],
                     "match_count": 0,
                     "blind_spot": True,
                     "is_high_frequency": False,
+                    "difficulty": "BASIC", # Blind spots default to basic until matched
+                    "youtube_url": youtube_url,
                     "coverage_strength": "LOW"
                 })
                 continue
@@ -109,12 +118,8 @@ def get_coverage_matrix(syllabus_id: str) -> list: # FIXED: Returns array not di
                 "coverage_strength": "HIGH" if len(match_data) >= 3 else "MED" if len(match_data) > 0 else "LOW"
             })
                 
-        return coverage_list # FIXED: Final array return
+        return coverage_list
         
     except Exception as e:
         logger.error(f"Error in get_coverage_matrix for syllabus {syllabus_id}: {str(e)}", exc_info=True)
         return []
-        
-    except Exception as e:
-        logger.error(f"Error in get_coverage_matrix for syllabus {syllabus_id}: {str(e)}", exc_info=True)
-        return {}

@@ -24,6 +24,7 @@ export function StaggerSidebar() {
         { path: '/', icon: Home, label: 'Home' },
         { path: '/upload', icon: Upload, label: 'Upload', state: location.state },
         { path: '/analysis', icon: Brain, label: 'Brain', state: location.state },
+        { path: '/mission-intel', icon: Zap, label: 'Mission Intel' },
         { path: '/how-it-works', icon: Cpu, label: 'How It Works' },
         { path: '/about', icon: Info, label: 'About' },
     ];

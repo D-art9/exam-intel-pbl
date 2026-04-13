@@ -17,6 +17,7 @@ import { LecturePlanChatPage } from './pages/LecturePlanChatPage';
 import { AnalysisPage } from './pages/AnalysisPage';
 import ModeSelection from './pages/ModeSelection';
 import { PaperGenerator } from './pages/PaperGenerator';
+import AboutIntelligence from './pages/AboutIntelligence';
 
 
 
@@ -49,6 +50,7 @@ function App() {
         <Route path="contact" element={<ContactPage />} />
         <Route path="how-it-works" element={<HowItWorksPage />} />
         <Route path="flow" element={<FlowPage />} />
+        <Route path="mission-intel" element={<AboutIntelligence />} />
         <Route path="subject-results/:documentId" element={<SubjectAnalysisPage />} />
         <Route path="dashboard/:documentId" element={<SplitAnalysisPage />} />
         <Route path="lecture-plan/:documentId" element={<LecturePlanChatPage />} />

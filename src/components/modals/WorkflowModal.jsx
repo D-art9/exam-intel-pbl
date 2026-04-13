@@ -6,15 +6,7 @@ import {
 } from 'lucide-react';
 import { NeoCard, NeoButton } from '../neo/NeoComponents';
 
-interface WorkflowStep {
-    id: number;
-    title: string;
-    description: string;
-    icon: LucideIcon;
-    color: string;
-}
-
-const steps: WorkflowStep[] = [
+const steps = [
     { 
         id: 1, 
         title: "PDF Ingestion", 

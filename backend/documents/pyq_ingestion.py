@@ -181,24 +181,21 @@ def ingest_pyq(file_path):
     
     print(f"Extraction yield: {len(extracted)} question blocks.")
 
-    # 3. Embed and Save
+    # 3. Embed and Save (Parallel Processing)
+    from concurrent.futures import ThreadPoolExecutor
     embedding_model = get_embedding_model()
-    inserted_count = 0
     
-    for q in extracted:
-        text = q['text']
-        q_num = q['num']
+    def process_and_save_q(q_data):
+        """Helper to process a single question in a worker thread."""
+        text = q_data['text']
+        q_num = q_data['num']
         marks = parse_marks(text)
         
-        # Embed question
         try:
+            # Embed question (The slow network part)
             embedding = embedding_model.embed_query(text)
-        except Exception as e:
-            print(f"Error embedding question {q_num}: {e}")
-            continue
-        
-        # FIXED: Using Django ORM instead of raw cursor
-        try:
+            
+            # Save to Database
             obj, created = PYQQuestion.objects.update_or_create(
                 source_paper=filename,
                 question_number=q_num,
@@ -210,12 +207,17 @@ def ingest_pyq(file_path):
                     'embedding': embedding
                 }
             )
-            inserted_count += 1
+            return True
         except Exception as e:
-            print(f"Error saving question {q_num} to database: {e}")
-            continue
-                
-    print(f"Successfully processed and inserted/updated {inserted_count} questions.")
+            print(f"!!! [CONCURRENCY ERROR] Failed on question {q_num}: {e}")
+            return False
+
+    print(f"   -> [CORE] Starting Parallel Inference (Workers: 10)...")
+    with ThreadPoolExecutor(max_workers=10) as executor:
+        results = list(executor.map(process_and_save_q, extracted))
+    
+    inserted_count = sum(results)
+    print(f"--- [MISSION COMPLETE] Processed {inserted_count} out of {len(extracted)} questions in PARALLEL. ---")
     return inserted_count
                 
     print(f"Successfully processed and inserted/updated {inserted_count} questions.")

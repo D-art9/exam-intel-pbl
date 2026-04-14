@@ -71,7 +71,7 @@ def answer_question(document_id, question):
         t0 = time.time()
         llm = ChatGroq(
             temperature=0, 
-            model_name="llama-3.1-8b-instant", 
+            model_name="llama-3.3-70b-versatile", 
             api_key=settings.GROQ_API_KEY
         )
 

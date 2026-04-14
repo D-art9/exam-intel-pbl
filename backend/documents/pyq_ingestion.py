@@ -93,7 +93,7 @@ def extract_questions_with_llm(markdown_text):
     try:
         llm = ChatGroq(
             temperature=0, 
-            model_name="llama-3.1-8b-instant", 
+            model_name="llama-3.3-70b-versatile", 
             api_key=settings.GROQ_API_KEY
         )
 

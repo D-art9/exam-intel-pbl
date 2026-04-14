@@ -43,7 +43,7 @@ def generate_paper(config: PaperConfig, syllabus_id: str) -> str:
         # 1. Initialize Groq client once for potential fallbacks
         groq_client = ChatGroq(
             temperature=0.7,
-            model_name="llama-3.3-70b-versatile",
+            model_name="llama-3.1-8b-instant",
             api_key=settings.GROQ_API_KEY
         )
 

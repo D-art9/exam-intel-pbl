@@ -67,9 +67,16 @@ def get_coverage_matrix(syllabus_id: str) -> list: # FIXED: Returns array not di
             
             match_data = []
             unique_years = set()
+            seen_texts = set() # FIXED: De-duplication set
             
             # 3. Process matches
             for m in matches_list:
+                # Normalize text for de-duplication
+                norm_text = m.question_text.lower().strip()
+                if norm_text in seen_texts:
+                    continue
+                seen_texts.add(norm_text)
+
                 if m.year:
                     recency = max(0.5, 1.0 - ((2025 - m.year) * 0.1))
                     unique_years.add(m.year)

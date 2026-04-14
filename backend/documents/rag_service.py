@@ -134,7 +134,7 @@ def generate_lecture_plan(document_id):
         print(f"Step 2: Calling Groq (Llama 3) for extraction...")
         llm = ChatGroq(
             temperature=0, 
-            model_name="llama-3.3-70b-versatile", 
+            model_name="llama-3.1-8b-instant", 
             api_key=settings.GROQ_API_KEY
         )
 
